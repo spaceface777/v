@@ -1,4 +1,5 @@
 import hello as hl
+import hello.hello1
 
 fn JS.alert(arg string)
 
@@ -60,6 +61,9 @@ fn main() {
 
     dun := i_am_a_const * 20
     dunn := hl.hello // External constant
+    println(dunn)
+
+	println(hello1.nested())
 
     for i := 0; i < 10; i++ {}
 
