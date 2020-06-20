@@ -825,7 +825,7 @@ fn (mut g JsGen) gen_method_decl(it ast.FnDecl) {
 	} else {
 		mut name := g.js_name(it.name)
 		c := name[0]
-		if c in [`+`, `-`, `*`, `/`] {
+		if c in [`+`, `-`, `*`, `/`, `%`] {
 			name = util.replace_op(name)
 		}
 
@@ -1311,6 +1311,13 @@ fn (mut g JsGen) gen_infix_expr(it ast.InfixExpr) {
 		g.expr(it.left)
 		g.write(')')
 		if it.op == .not_in { g.write(')') }
+	} else if l_sym.kind == .struct_ && r_sym.kind == .struct_ && it.op in [.plus, .minus, .mul, .div, .mod] {
+		g.expr(it.left)
+		g.write('.')
+		g.write(util.replace_op(it.op.str()))
+		g.write('(')
+		g.expr(it.right)
+		g.write(')')
 	} else if it.op in [.key_is, .not_is] { // foo is Foo
 		if it.op == .not_is { g.write('!(') }
 		g.expr(it.left)
