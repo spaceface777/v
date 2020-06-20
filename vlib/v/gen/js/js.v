@@ -512,7 +512,7 @@ fn (mut g JsGen) expr(node ast.Expr) {
 			// TODO: Is jsdoc needed here for TS support?
 		}
 		ast.Assoc {
-			// TODO
+			g.gen_assoc(it)
 		}
 		ast.BoolLiteral {
 			if it.val == true {
@@ -1120,6 +1120,17 @@ fn (mut g JsGen) gen_array_init_values(exprs []ast.Expr) {
 		}
 	}
 	g.write(']')
+}
+
+fn (mut g JsGen) gen_assoc(it ast.Assoc) {
+	typ := g.typ(it.typ)
+	g.write('new $typ ({...$it.var_name, ')
+	for i, expr in it.exprs {
+		g.write('${g.js_name(it.fields[i])}: ')
+		g.expr(expr)
+		if i < it.exprs.len - 1 { g.write(', ') }
+	}
+	g.write('})')
 }
 
 fn (mut g JsGen) gen_call_expr(it ast.CallExpr) {
