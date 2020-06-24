@@ -1335,18 +1335,16 @@ fn (mut g JsGen) gen_infix_expr(it ast.InfixExpr) {
 		g.write(' instanceof ')
 		g.write(g.typ(it.right_type))
 		if it.op == .not_is { g.write(')') }
+	} else if it.op in [.eq, .ne] {
+		if it.op == .ne { g.write('!') }
+		g.write('builtin.deep_equal(')
+		g.expr(it.left)
+		g.write(', ')
+		g.expr(it.right)
+		g.write(')')
 	} else {
 		g.expr(it.left)
-
-		// in js == is non-strict & === is strict, always do strict
-		if it.op == .eq {
-			g.write(' === ')
-		} else if it.op == .ne {
-			g.write(' !== ')
-		} else {
-			g.write(' $it.op ')
-		}
-
+		g.write(' $it.op ')
 		g.expr(it.right)
 	}
 }
