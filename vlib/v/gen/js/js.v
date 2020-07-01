@@ -85,9 +85,13 @@ pub fn gen(files []ast.File, table &table.Table, pref &pref.Preferences) string 
 		// store the current namespace
 		g.escape_namespace()
 	}
+	// add fns in `js_definitions.v` to builtin
+	g.builtin_definitions()
+
 	// resolve imports
 	deps_resolved := graph.resolve()
 	nodes := deps_resolved.nodes
+
 	mut out := g.hashes() + g.definitions.str()
 	for node in nodes {
 		name := g.js_name(node.name).replace('.', '_')
