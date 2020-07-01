@@ -92,54 +92,58 @@ pub fn gen(files []ast.File, table &table.Table, pref &pref.Preferences) string 
 	deps_resolved := graph.resolve()
 	nodes := deps_resolved.nodes
 
-	mut out := g.hashes() + g.definitions.str()
-	for node in nodes {
+	g.builtin_definitions()
+
+	mut out := strings.new_builder(5000)
+	out.writeln(g.hashes())
+	out.writeln(g.definitions.str())
+
+	if g.enable_doc {
+		for key, val in typedefs {
+			out.writeln('/** @typedef {$val} $key */')
+		}
+		out.writeln('')
+	}
+
+	for node in deps_resolved.nodes {
 		name := g.js_name(node.name).replace('.', '_')
 		if g.enable_doc {
-			out += '/** @namespace $name */\n'
+			out.writeln('/** @namespace $name */')
 		}
-		out += 'const $name = (function ('
+		out.write('const $name = (function (')
 		imports := g.namespace_imports[node.name]
 		for i, key in imports.keys() {
-			if i > 0 {
-				out += ', '
-			}
-			out += imports[key]
+			if i > 0 { out.write(', ') }
+			out.write(imports[key])
 		}
-		out += ') {\n\t'
+		out.write(') {\n\t')
+
 		// private scope
-		out += g.namespaces[node.name].str().trim_space()
+		out.write(g.namespaces[node.name].str().trim_space())
+
 		// public scope
-		out += '\n'
-		if g.enable_doc {
-			out += '\n\t/* module exports */'
-		}
-		out += '\n\treturn {'
+		out.writeln('')
+		if g.enable_doc { out.write('\n\t/** exports */') }
+		out.write('\n\treturn {')
 		for i, pub_var in g.namespaces_pub[node.name] {
-			out += '\n\t\t$pub_var'
-			if i < g.namespaces_pub[node.name].len - 1 {
-				out += ','
-			}
+			out.write('\n\t\t$pub_var')
+			if i < g.namespaces_pub[node.name].len - 1 { out.write(',')}
 		}
-		if g.namespaces_pub[node.name].len > 0 {
-			out += '\n\t'
-		}
-		out += '};'
-		out += '\n})('
+		if g.namespaces_pub[node.name].len > 0 { out.write('\n\t') }
+		out.write('};')
+		out.write('\n})(')
 		for i, key in imports.keys() {
-			if i > 0 {
-				out += ', '
-			}
-			out += key.replace('.', '_')
+			if i > 0 { out.write(', ') }
+			out.write(key.replace('.', '_'))
 		}
-		out += ');\n\n'
+		out.writeln(');\n')
 	}
 	if pref.is_shared {
 		// Export, through CommonJS, the module of the entry file if `-shared` was passed
 		export := nodes[nodes.len - 1].name
-		out += 'if (typeof module === "object" && module.exports) module.exports = $export;'
+		out.writeln('if (typeof module === "object" && module.exports) module.exports = $export;')
 	}
-	return out
+	return out.str()
 }
 
 pub fn (mut g JsGen) enter_namespace(n string) {
