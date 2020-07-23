@@ -6,6 +6,26 @@ const (
 	v_options  = '-b js -w'
 )
 
+
+
+
+/*
+	ts_exe        = 'npx typescript'
+	ts_flags      = '--allowJs --checkJs --noemit --lib es6 --downlevelIteration'
+	ts_node_flags = '--'
+)
+*/
+
+
+
+
+
+
+
+
+
+
+
 fn test_example_compilation() {
 	vexe := os.getenv('VEXE')
 	os.chdir(os.dir(vexe))
@@ -17,11 +37,17 @@ fn test_example_compilation() {
 		path := os.join_path(test_dir, file)
 		println('Testing $file')
 
-		v_code := os.system('$vexe $v_options -o ${output_dir}${file}.js $path')
-		if v_code != 0 { assert false } // Compilation failed
+		build_result := os.exec('$vexe $v_options -o ${output_dir}${file}.js $path') or { assert false return }
+		if build_result.exit_code != 0 { // Compilation failed
+			os.rmdir_all(output_dir)
+			assert false
+		}
 
-		js_code := os.system('node ${output_dir}${file}.js')
-		if js_code != 0 { assert false } // Running failed
+		exec_result := os.exec('node ${output_dir}${file}.js') or {	assert false return }
+		if exec_result.exit_code != 0 || 'unhandled' in exec_result.output.to_lower() { // Running failed
+			os.rmdir_all(output_dir)
+			assert false
+		}
 	}
 
 	os.rmdir_all(output_dir)
@@ -29,8 +55,7 @@ fn test_example_compilation() {
 
 fn find_test_files() []string {
 	files := os.ls(test_dir) or { panic(err) }
-	// The life example never exits, so tests would hang with it, skip
-	mut tests := files.filter(it.ends_with('.v')).filter(it != 'life.v')
+	mut tests := files.filter(it.ends_with('.v'))
 	tests.sort()
 	return tests
 }

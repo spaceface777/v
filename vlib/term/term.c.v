@@ -8,30 +8,35 @@ const (
 )
 // can_show_color_on_stdout returns true if colors are allowed in stdout;
 // returns false otherwise.
+[inline]
 pub fn can_show_color_on_stdout() bool {
 	return supports_escape_sequences(1)
 }
 
 // can_show_color_on_stderr returns true if colors are allowed in stderr;
 // returns false otherwise.
+[inline]
 pub fn can_show_color_on_stderr() bool {
 	return supports_escape_sequences(2)
 }
 
 // ok_message returns a colored string with green color.
 // If colors are not allowed, returns a given string.
+[inline]
 pub fn ok_message(s string) string {
 	return if can_show_color_on_stdout() { green(s) } else { s }
 }
 
 // fail_message returns a colored string with red color.
 // If colors are not allowed, returns a given string.
+[inline]
 pub fn fail_message(s string) string {
 	return if can_show_color_on_stdout() { bold(bg_red(white(s))) } else { s }
 }
 
 // warn_message returns a colored string with yellow color.
 // If colors are not allowed, returns a given string.
+[inline]
 pub fn warn_message(s string) string {
 	return if can_show_color_on_stdout() { bright_yellow(s) } else { s }
 }
@@ -77,9 +82,7 @@ fn supports_escape_sequences(fd int) bool {
 }
 
 // clear clears current terminal screen.
+[inline]
 pub fn clear() {
-	$if !windows {
-		C.printf('\x1b[2J')
-		C.printf('\x1b[H')
-	}
+	erase_clear()
 }

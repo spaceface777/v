@@ -1,64 +1,76 @@
-fn clear() { JS.console.clear() }
+import term
 
-const (w = 30 h = 30)
+const (
+	w = 35
+	h = 25
+)
 
-fn get(game [][]bool, x int, y int) bool {
-	if y < 0 || x < 0 { return false }
-	if y >= h || x >= w { return false }
-	
-	return game[y][x]
+struct Game {
+pub mut:
+	cells [][]bool
 }
 
-fn neighbours(game [][]bool, x int, y int) int {
+fn (mut g Game) get(x, y int) bool {
+	if y < 0 || x < 0 { return false }
+	if y >= h || x >= w { return false }
+
+	return g.cells[y][x]
+}
+
+fn (mut g Game) neighbours(x, y int) int {
 	mut count := 0
-	if get(game, x-1, y-1) { count++ }
-	if get(game, x, y-1) { count++ }
-	if get(game, x+1, y-1) { count++ }
-	if get(game, x-1, y) { count++ }
-	if get(game, x+1, y) { count++ }
-	if get(game, x-1, y+1) { count++ }
-	if get(game, x, y+1) { count++ }
-	if get(game, x+1, y+1) { count++ }
+	if g.get(x-1, y-1) { count++ }
+	if g.get(x, y-1)   { count++ }
+	if g.get(x+1, y-1) { count++ }
+	if g.get(x-1, y)   { count++ }
+	if g.get(x+1, y)   { count++ }
+	if g.get(x-1, y+1) { count++ }
+	if g.get(x, y+1)   { count++ }
+	if g.get(x+1, y+1) { count++ }
 	return count
 }
 
-fn step(game [][]bool) [][]bool {
+fn (mut g Game) step() {
+	term.clear()
+	println(g)
+
 	mut new_game := [][]bool{}
-	for y, row in game {
+	for y, row in g.cells {
 		mut new_row := []bool{}
-		new_game[y] = new_row
 		for x, cell in row {
-			count := neighbours(game, x, y)
+			count := g.neighbours(x, y)
 			new_row[x] = (cell && count in [2, 3]) || count == 3
 		}
+		new_game[y] = new_row
 	}
-	return new_game
+
+	for new_game != g.cells {
+		g.cells = new_game
+		JS.setTimeout(fn() { g.step() }, 0)
+	}
 }
 
-fn row_str(row []bool) string {
+fn (mut g Game) str() string {
 	mut str := ''
-	for cell in row {
-		if cell { str += '◼ ' }
-		else { str += '◻ ' }
+	for row in g.cells {
+		for cell in row {
+			str += if cell { '◼ ' } else { '◻ ' }
+		}
+		str += '\n'
 	}
 	return str
 }
 
-fn show(game [][]bool) {
-	clear()
-	for row in game {
-		println(row_str(row))
-	}
+mut game := Game{
+	cells: [][]bool{ len: h, init: []bool{ len: w } }
 }
 
-mut game := [][]bool{ len: h, init: []bool{ len: w } }
+game.cells[6][15] = true
+game.cells[6][16] = true
+game.cells[7][16] = true
+game.cells[5][21] = true
+game.cells[7][20] = true
+game.cells[7][21] = true
+game.cells[7][22] = true
 
-game[11][15] = true
-game[11][16] = true
-game[12][16] = true
-game[10][21] = true
-game[12][20] = true
-game[12][21] = true
-game[12][22] = true
-
-JS.setInterval(fn () { show(game) game = step(game) }, 500)
+game.step()

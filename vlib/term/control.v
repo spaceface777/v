@@ -2,6 +2,7 @@
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
 module term
+
 // Sources for ANSI Control Sequences
 // https://github.com/RajeshPatkarInstitute/Panim
 // https://www.gnu.org/software/screen/manual/html_node/Control-Sequences.html
@@ -13,7 +14,8 @@ module term
 // Setting cursor to the given position
 // x is the x coordinate
 // y is the y coordinate
-pub fn set_cursor_position(x int, y int) {
+[inline]
+pub fn set_cursor_position(x, y int) {
 	print('\x1b[$y;$x' + 'H')
 }
 
@@ -22,22 +24,27 @@ pub fn set_cursor_position(x int, y int) {
 // direction: B is down / South
 // direction: C is forward / East
 // direction: D is backward / West
+[inline]
 pub fn move(n int, direction string) {
 	print('\x1b[$n$direction')
 }
 
+[inline]
 pub fn cursor_up(n int) {
 	move(n, 'A')
 }
 
+[inline]
 pub fn cursor_down(n int) {
 	move(n, 'B')
 }
 
+[inline]
 pub fn cursor_forward(n int) {
 	move(n, 'C')
 }
 
+[inline]
 pub fn cursor_back(n int) {
 	move(n, 'D')
 }
@@ -46,22 +53,27 @@ pub fn cursor_back(n int) {
 // type: 1 -> current cursor position to beginning of the screen
 // type: 2 -> clears entire screen
 // type: 3 -> clears entire screen and also delete scrollback buffer
+[inline]
 pub fn erase_display(t string) {
 	print('\x1b[' + t + 'J')
 }
 
+[inline]
 pub fn erase_toend() {
 	erase_display('0')
 }
 
+[inline]
 pub fn erase_tobeg() {
 	erase_display('1')
 }
 
+[inline]
 pub fn erase_clear() {
 	erase_display('2')
 }
 
+[inline]
 pub fn erase_del_clear() {
 	erase_display('3')
 }
@@ -70,28 +82,34 @@ pub fn erase_del_clear() {
 // type: 1 -> current cursor position to beginning of the line
 // type: 2 -> clears entire line
 // Note: Cursor position does not change
+[inline]
 pub fn erase_line(t string) {
 	print('\x1b[' + t + 'K')
 }
 
+[inline]
 pub fn erase_line_toend() {
 	erase_line('0')
 }
 
+[inline]
 pub fn erase_line_tobeg() {
 	erase_line('1')
 }
 
+[inline]
 pub fn erase_line_clear() {
 	erase_line('2')
 }
 
 // Will make cursor appear if not visible
+[inline]
 pub fn show_cursor() {
 	print('\x1b[?25h')
 }
 
 // Will make cursor invisible
+[inline]
 pub fn hide_cursor() {
 	print('\x1b[?25l')
 }

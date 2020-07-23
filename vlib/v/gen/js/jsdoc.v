@@ -31,6 +31,10 @@ fn (mut d JsDoc) gen_const(typ string) {
 	d.writeln('/** @constant {$typ} */')
 }
 
+fn (mut d JsDoc) gen_global(typ string) {
+	d.writeln('/** @global {$typ} */')
+}
+
 fn (mut d JsDoc) gen_enum() {
 	// Enum values can only be ints for now
 	typ := 'number'
@@ -53,11 +57,24 @@ fn (mut d JsDoc) gen_fac_fn(fields []ast.StructField) {
 
 fn (mut d JsDoc) gen_fn(it ast.FnDecl) {
 	type_name := d.gen.typ(it.return_type)
+	//if it.return_type.has_flag(.optional) { }
 	d.writeln('/**')
 	d.writeln(' * @function')
 	if it.is_deprecated {
 		d.writeln(' * @deprecated')
 	}
+	/* TODO
+	if it.is_generic {
+		mut generic_types := []string{}
+		for arg in it.args {
+			name := d.gen.table.get_type_name(arg.typ)
+			if name !in generic_types {
+				d.writeln(' * @template $name')
+				generic_types << name
+			}
+		}
+	}
+	*/
 	for i, arg in it.args {
 		if (it.is_method || it.receiver.typ == 0) && i == 0 {
 			continue

@@ -16,7 +16,7 @@ const(
 match_test_suite = [
 
 	// positive
-	TestItem{"this is a good.",r"this",0,4},
+	TestItem{"th sdadis is a good.",r"this",0,4},
 	TestItem{"this is a good.",r"good",10,14},
 	TestItem{"this is a good.",r"go+d",10,14},
 	TestItem{"this is a good.",r"g[oae]+d",10,14},
