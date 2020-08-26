@@ -86,6 +86,7 @@ jobs:
           v test-fixed
 
   macos:
+    needs: create-release
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -148,8 +149,29 @@ jobs:
         ../v examples/rectangles.v
 #        ../v examples/users.v
 #        ../v examples/calculator.v
+    - name: Clean up
+      run: |
+        git clean -xf
+        make
+        ./v -prod -compress self
+        rm v_old
+        rm -rf vc/
+    - name: Upload prerelease
+      continue-on-error: true
+      uses: spaceface777/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        # run_if: ${{ github.event_name == 'push' && endsWith(github.ref, 'master') }}
+        tag_name: latest
+        attach_only: true
+        create_zip: true
+        files: "**/*"
+        filename: v_macos.zip
+
 
   ubuntu:
+    needs: create-release
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
@@ -205,6 +227,25 @@ jobs:
         ../../vprod -backend x64 -o 1m 1m.v
         echo "Running it..."
         ls
+    - name: Clean up
+      run: |
+        git clean -xf
+        make
+        ./v -prod -compress self
+        rm v_old
+        rm -rf vc/
+    - name: Upload prerelease
+      # continue-on-error: true
+      uses: spaceface777/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        # run_if: ${{ github.event_name == 'push' && endsWith(github.ref, 'master') }}
+        tag_name: latest
+        attach_only: true
+        create_zip: true
+        files: "**/*"
+        filename: v_linux.zip
 #    - name: SDL examples
 #      run: git clone --depth 1 https://github.com/vlang/sdl && cd sdl
 
@@ -286,6 +327,7 @@ jobs:
 #      run: docker build . -f Dockerfile.cross
 
   windows-gcc:
+    needs: create-release
     runs-on: windows-2019
     env:
         VFLAGS: -cc gcc
@@ -308,6 +350,28 @@ jobs:
     - name: Fixed tests
       run: |
         .\v.exe test-fixed
+    - name: Clean up
+      run: |
+        git clean -xf
+        .\make.bat -gcc
+        .\v.exe -prod self
+        rm v_old.exe
+        rm vc\ -Recurse -Force
+        rm thirdparty\sqlite\ -Recurse -Force
+        rm thirdparty\freetype\ -Recurse -Force
+    - name: Upload prerelease
+      # continue-on-error: true
+      uses: spaceface777/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        # run_if: ${{ github.event_name == 'push' && endsWith(github.ref, 'master') }}
+        tag_name: latest
+        attach_only: true
+        create_zip: true
+        files: "**/*"
+        filename: v_windows.zip
+
 #    - name: Test
 #      run: |
 #        .\v.exe -silent test-compiler
@@ -478,7 +542,26 @@ jobs:
         ../v -autofree .
         cd ..
 
-  # TODO: ACTIVATE THIS AFTER MERGE
+  # Helper job to initialize a new prerelease 
+  create-release:
+    name: Create release
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+    - name: Create release
+      id: create-release
+      uses: spaceface777/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        # run_if: ${{ github.event_name == 'push' && endsWith(github.ref, 'master') }}
+        create_only: true
+        name: V master
+        tag_name: latest
+        overwrite: true
+        body: Prebuilt release of the latest green commit to `master`, ${{ github.sha }}
+        draft: false
+        prerelease: true
 
   websocket_autobahn:
     name: Autobahn integrations tests
@@ -499,20 +582,8 @@ jobs:
         run: docker cp autobahn_server:/reports ${{github.workspace}}/reports
       - name: Test success
         run: docker exec autobahn_server "python" "/check_results.py"
-      
-      - name: Publish all reports
+      - name: Publish reports
         uses: actions/upload-artifact@v2
         with:
-            name: full report
-            path: ${{github.workspace}}/reports
-      - name: Publish report client
-        uses: actions/upload-artifact@v2
-        with:
-            name: client
-            path: ${{github.workspace}}/reports/clients/index.html
-      - name: Publish report server
-        uses: actions/upload-artifact@v2
-        with:
-            name: server
-            path: ${{github.workspace}}/reports/servers/index.html
-  
+          name: autobahn_report.zip
+          path: ${{github.workspace}}/reports
