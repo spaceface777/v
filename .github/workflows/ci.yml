@@ -158,7 +158,7 @@ jobs:
         rm -rf v_old cmd/tools/vself vc/ ui/ vid/ tutorials/img/ examples/game_of_life/demo.gif
     - name: Upload prerelease
       continue-on-error: true
-      uses: spaceface777/action-gh-release@v1.0.25
+      uses: spaceface777/action-gh-release@v1.0.26
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -235,7 +235,7 @@ jobs:
         rm -rf v_old cmd/tools/vself vc/ tutorials/img/ examples/game_of_life/demo.gif
     - name: Upload prerelease
       # continue-on-error: true
-      uses: spaceface777/action-gh-release@v1.0.25
+      uses: spaceface777/action-gh-release@v1.0.26
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -357,7 +357,7 @@ jobs:
         rm v_old.exe, vc\, thirdparty\sqlite\, thirdparty\freetype\, cmd\tools\vself.exe, tutorials\img\, examples\game_of_life\demo.gif -Recurse -Force -ErrorAction SilentlyContinue
     - name: Upload prerelease
       # continue-on-error: true
-      uses: spaceface777/action-gh-release@v1.0.25
+      uses: spaceface777/action-gh-release@v1.0.26
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -546,7 +546,7 @@ jobs:
     steps:
     - name: Create release
       id: create-release
-      uses: spaceface777/action-gh-release@v1.0.25
+      uses: spaceface777/action-gh-release@v1.0.26
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
