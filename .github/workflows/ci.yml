@@ -354,7 +354,7 @@ jobs:
         git clean -xf
         .\make.bat -gcc
         .\v.exe -prod self
-        rm v_old.exe vc\ thirdparty\sqlite\ thirdparty\freetype\ -Recurse -Force -ErrorAction SilentlyContinue
+        rm v_old.exe, vc\, thirdparty\sqlite\, thirdparty\freetype\ -Recurse -Force -ErrorAction SilentlyContinue
     - name: Upload prerelease
       # continue-on-error: true
       uses: spaceface777/action-gh-release@v2
