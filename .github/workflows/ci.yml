@@ -154,7 +154,8 @@ jobs:
         git clean -xf
         make
         ./v -prod -compress self
-        rm -rf v_old vc/ *.dSYM ui/ vid/
+        find . -name '*.dSYM' -exec rm -rf {} +
+        rm -rf v_old vc/ ui/ vid/
     - name: Upload prerelease
       continue-on-error: true
       uses: spaceface777/action-gh-release@v2
@@ -541,8 +542,8 @@ jobs:
   create-release:
     name: Create release
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
+    continue-on-error: true
     - name: Create release
       id: create-release
       uses: spaceface777/action-gh-release@v2
