@@ -124,29 +124,29 @@ jobs:
 ##      run: ./v -o hi.js examples/hello_v_js.v && node hi.js
     - name: Test symlink
       run:  ./v symlink && v -o v2 cmd/v
-    - name: Fixed tests
-      run: VJOBS=1 ./v test-fixed
-    - name: Build examples
-      run: ./v build-examples
-    - name: v vet
-      run: |
-        ./v vet vlib/sqlite
-        ./v vet vlib/v
-    - name: Cross-compilation to Linux
-      run: ./v -os linux cmd/v
-#    - name: Test vsh
-#      run:  ./v examples/v_script.vsh
-    - name: Test vid
-      run: |
-        git clone --depth 1 https://github.com/vlang/vid
-        cd vid && ../v -o vid .
-    - name: Build V UI examples
-      run: |
-        git clone --depth 1 https://github.com/vlang/ui
-        cd ui
-        mkdir -p ~/.vmodules
-        ln -s $(pwd) ~/.vmodules/ui
-        ../v examples/rectangles.v
+#     - name: Fixed tests
+#       run: VJOBS=1 ./v test-fixed
+#     - name: Build examples
+#       run: ./v build-examples
+#     - name: v vet
+#       run: |
+#         ./v vet vlib/sqlite
+#         ./v vet vlib/v
+#     - name: Cross-compilation to Linux
+#       run: ./v -os linux cmd/v
+# #    - name: Test vsh
+# #      run:  ./v examples/v_script.vsh
+#     - name: Test vid
+#       run: |
+#         git clone --depth 1 https://github.com/vlang/vid
+#         cd vid && ../v -o vid .
+#     - name: Build V UI examples
+#       run: |
+#         git clone --depth 1 https://github.com/vlang/ui
+#         cd ui
+#         mkdir -p ~/.vmodules
+#         ln -s $(pwd) ~/.vmodules/ui
+#         ../v examples/rectangles.v
 #        ../v examples/users.v
 #        ../v examples/calculator.v
     - name: Clean up
@@ -155,7 +155,7 @@ jobs:
         make
         ./v -prod -compress self
         rm v_old
-        rm -rf vc/
+        rm -rf vc/ *.dSYM ui/ vid/
     - name: Upload prerelease
       continue-on-error: true
       uses: spaceface777/action-gh-release@v2
@@ -178,13 +178,13 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: 12.x
-    - name: Install dependencies
-      run: |
-         sudo rm -f /etc/apt/sources.list.d/dotnetdev.list /etc/apt/sources.list.d/microsoft-prod.list;
-         sudo apt-get update;
-         sudo apt-get install --quiet -y postgresql libpq-dev libssl-dev sqlite3 libsqlite3-dev valgrind
-         sudo apt-get install --quiet -y libglfw3 libglfw3-dev  libfreetype6-dev  libxi-dev libxcursor-dev libasound2-dev
-         ## sudo apt-get install --quiet -y libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-image-dev
+    # - name: Install dependencies
+    #   run: |
+    #      sudo rm -f /etc/apt/sources.list.d/dotnetdev.list /etc/apt/sources.list.d/microsoft-prod.list;
+    #      sudo apt-get update;
+    #      sudo apt-get install --quiet -y postgresql libpq-dev libssl-dev sqlite3 libsqlite3-dev valgrind
+    #      sudo apt-get install --quiet -y libglfw3 libglfw3-dev  libfreetype6-dev  libxi-dev libxcursor-dev libasound2-dev
+    #      ## sudo apt-get install --quiet -y libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-image-dev
     - name: Build V
       run: make -j4 && ./v -cc gcc -o v cmd/v
 #    - name: Test V
@@ -203,30 +203,30 @@ jobs:
 #      run: ./v -freestanding -o bare vlib/os/bare/bare_example_linux.v
     - name: v self compilation
       run: ./v -o v2 cmd/v && ./v2 -o v3 cmd/v && ./v3 -o v4 cmd/v
-    - name: Fixed tests
-      run: |
-        ./v test-fixed
-    - name: Fixed tests (-prod)
-      run: ./v -o vprod -prod cmd/v && ./vprod test-fixed
-    - name: Build examples
-      run: ./v build-examples
-    - name: Build modules
-      run: |
-        ./v build-module vlib/os
-        ./v build-module vlib/builtin
-        ./v build-module vlib/strconv
-    - name: x64 machine code generation
-      run: |
-        exit
-        ./v -o vprod -prod cmd/v
-        cd cmd/tools
-        echo "Generating a 1m line V file..."
-        ../../vprod gen1m.v
-        ./gen1m > 1m.v
-        echo "Building it..."
-        ../../vprod -backend x64 -o 1m 1m.v
-        echo "Running it..."
-        ls
+    # - name: Fixed tests
+    #   run: |
+    #     ./v test-fixed
+    # - name: Fixed tests (-prod)
+    #   run: ./v -o vprod -prod cmd/v && ./vprod test-fixed
+    # - name: Build examples
+    #   run: ./v build-examples
+    # - name: Build modules
+    #   run: |
+    #     ./v build-module vlib/os
+    #     ./v build-module vlib/builtin
+    #     ./v build-module vlib/strconv
+    # - name: x64 machine code generation
+    #   run: |
+    #     exit
+    #     ./v -o vprod -prod cmd/v
+    #     cd cmd/tools
+    #     echo "Generating a 1m line V file..."
+    #     ../../vprod gen1m.v
+    #     ./gen1m > 1m.v
+    #     echo "Building it..."
+    #     ../../vprod -backend x64 -o 1m 1m.v
+    #     echo "Running it..."
+    #     ls
     - name: Clean up
       run: |
         git clean -xf
@@ -342,14 +342,14 @@ jobs:
         .\make.bat -gcc
     - name: Test new v.c
       run: .\v.exe -o v.c cmd/v && gcc -municode -w v.c
-    - name: Install dependencies
-      run: |
-        .\v.exe setup-freetype
-        .\.github\workflows\windows-install-sqlite.bat
-        ## .\.github\workflows\windows-install-sdl.bat
-    - name: Fixed tests
-      run: |
-        .\v.exe test-fixed
+    # - name: Install dependencies
+    #   run: |
+    #     .\v.exe setup-freetype
+    #     .\.github\workflows\windows-install-sqlite.bat
+    #     ## .\.github\workflows\windows-install-sdl.bat
+    # - name: Fixed tests
+    #   run: |
+    #     .\v.exe test-fixed
     - name: Clean up
       run: |
         git clean -xf
