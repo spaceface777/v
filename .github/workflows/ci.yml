@@ -541,9 +541,9 @@ jobs:
   # Helper job to initialize a new prerelease 
   create-release:
     name: Create release
+    continue-on-error: true
     runs-on: ubuntu-latest
     steps:
-    continue-on-error: true
     - name: Create release
       id: create-release
       uses: spaceface777/action-gh-release@v2
