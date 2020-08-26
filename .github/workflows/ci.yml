@@ -154,8 +154,7 @@ jobs:
         git clean -xf
         make
         ./v -prod -compress self
-        rm v_old
-        rm -rf vc/ *.dSYM ui/ vid/
+        rm -rf v_old vc/ *.dSYM ui/ vid/
     - name: Upload prerelease
       continue-on-error: true
       uses: spaceface777/action-gh-release@v2
@@ -232,8 +231,7 @@ jobs:
         git clean -xf
         make
         ./v -prod -compress self
-        rm v_old
-        rm -rf vc/
+        rm -rf v_old vc/
     - name: Upload prerelease
       # continue-on-error: true
       uses: spaceface777/action-gh-release@v2
@@ -355,10 +353,7 @@ jobs:
         git clean -xf
         .\make.bat -gcc
         .\v.exe -prod self
-        rm v_old.exe
-        rm vc\ -Recurse -Force
-        rm thirdparty\sqlite\ -Recurse -Force
-        rm thirdparty\freetype\ -Recurse -Force
+        rm v_old.exe vc\ thirdparty\sqlite\ thirdparty\freetype\ -Recurse -Force -ErrorAction SilentlyContinue
     - name: Upload prerelease
       # continue-on-error: true
       uses: spaceface777/action-gh-release@v2
