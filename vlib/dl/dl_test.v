@@ -4,8 +4,7 @@ fn test_dl() {
 	$if linux {
 		run_test_invalid_lib_linux()
 		return
-	}
-	$if windows {
+	} $else $if windows {
 		run_test_invalid_lib_windows()
 		run_test_valid_lib_windows()
 		run_test_invalid_sym_windows()

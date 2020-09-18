@@ -62,12 +62,8 @@ pub fn read_file(path string) ?string {
 pub fn file_size(path string) int {
 	mut s := C.stat{}
 	unsafe {
-		$if windows {
-			$if tinyc {
-				C.stat(charptr(path.str), &s)
-			} $else {
-				C._wstat(path.to_wide(), voidptr(&s))
-			}
+		$if windows && !tinyc {
+			C._wstat(path.to_wide(), voidptr(&s))
 		} $else {
 			C.stat(charptr(path.str), &s)
 		}
@@ -789,32 +785,23 @@ pub fn get_lines_joined() string {
 pub fn user_os() string {
 	$if linux {
 		return 'linux'
-	}
-	$if macos {
+	} $else $if macos {
 		return 'mac'
-	}
-	$if windows {
+	} $else $if windows {
 		return 'windows'
-	}
-	$if freebsd {
+	} $else $if freebsd {
 		return 'freebsd'
-	}
-	$if openbsd {
+	} $else $if openbsd {
 		return 'openbsd'
-	}
-	$if netbsd {
+	} $else $if netbsd {
 		return 'netbsd'
-	}
-	$if dragonfly {
+	} $else $if dragonfly {
 		return 'dragonfly'
-	}
-	$if android {
+	} $else $if android {
 		return 'android'
-	}
-	$if solaris {
+	} $else $if solaris {
 		return 'solaris'
-	}
-	$if haiku {
+	} $else $if haiku {
 		return 'haiku'
 	}
 	return 'unknown'
@@ -866,8 +853,7 @@ pub fn read_file_array<T>(path string) []T {
 pub fn on_segfault(f voidptr) {
 	$if windows {
 		return
-	}
-	$if macos {
+	} $else $if macos {
 		C.printf("TODO")
 		/*
 		mut sa := C.sigaction{}
@@ -891,8 +877,7 @@ pub fn executable() string {
 			return executable_fallback()
 		}
 		return unsafe { result.vstring() }
-	}
-	$if windows {
+	} $else $if windows {
 		max := 512
 		size := max * 2 // max_path_len * sizeof(wchar_t)
 		mut result := &u16(vcalloc(size))
@@ -919,8 +904,7 @@ pub fn executable() string {
 			C.CloseHandle(file)
 		}
 		return string_from_wide2(result, len)
-	}
-	$if macos {
+	} $else $if macos {
 		mut result := vcalloc(max_path_len)
 		pid := C.getpid()
 		ret := proc_pidpath(pid, result, max_path_len)
@@ -929,8 +913,7 @@ pub fn executable() string {
 			return executable_fallback()
 		}
 		return unsafe { result.vstring() }
-	}
-	$if freebsd {
+	} $else $if freebsd {
 		mut result := vcalloc(max_path_len)
 		mib := [1/* CTL_KERN */, 14/* KERN_PROC */, 12/* KERN_PROC_PATHNAME */, -1]
 		size := max_path_len
@@ -938,12 +921,7 @@ pub fn executable() string {
 			C.sysctl(mib.data, 4, result, &size, 0, 0)
 		}
 		return unsafe { result.vstring() }
-	}
-	// "Sadly there is no way to get the full path of the executed file in OpenBSD."
-	$if openbsd {}
-	$if solaris {}
-	$if haiku {}
-	$if netbsd {
+	} $else $if netbsd {
 		mut result := vcalloc(max_path_len)
 		count := C.readlink('/proc/curproc/exe', charptr(result), max_path_len)
 		if count < 0 {
@@ -951,8 +929,7 @@ pub fn executable() string {
 			return executable_fallback()
 		}
 		return unsafe { result.vstring_with_len(count) }
-	}
-	$if dragonfly {
+	} $else $if dragonfly {
 		mut result := vcalloc(max_path_len)
 		count := C.readlink('/proc/curproc/file', charptr(result), max_path_len)
 		if count < 0 {
@@ -961,6 +938,7 @@ pub fn executable() string {
 		}
 		return unsafe { result.vstring_with_len(count) }
 	}
+	// "Sadly there is no way to get the full path of the executed file in OpenBSD."
 	return executable_fallback()
 }
 
@@ -1196,8 +1174,7 @@ pub fn fork() int {
 	mut pid := -1
 	$if !windows {
 		pid = C.fork()
-	}
-	$if windows {
+	} $else {
 		panic('os.fork not supported in windows') // TODO
 	}
 	return pid
@@ -1209,8 +1186,7 @@ pub fn wait() int {
 	mut pid := -1
 	$if !windows {
 		pid = C.wait(0)
-	}
-	$if windows {
+	} $else {
 		panic('os.wait not supported in windows') // TODO
 	}
 	return pid
@@ -1299,8 +1275,7 @@ pub fn temp_dir() string {
 				path = 'C:/tmp'
 			}
 		}
-	}
-	$if android {
+	} $else if android {
 		// TODO test+use '/data/local/tmp' on Android before using cache_dir()
 		if path == '' {
 			path = os.cache_dir()
@@ -1339,16 +1314,14 @@ pub fn resource_abs_path(path string) string {
 // open tries to open a file for reading and returns back a read-only `File` object.
 pub fn open(path string) ?File {
   /*
-	$if linux {
-		$if !android {
-			fd := C.syscall(sys_open, path.str, 511)
-			if fd == -1 {
-				return error('failed to open file "$path"')
-			}
-			return File{
-				fd: fd
-				is_opened: true
-			}
+	$if linux && !android {
+		fd := C.syscall(sys_open, path.str, 511)
+		if fd == -1 {
+			return error('failed to open file "$path"')
+		}
+		return File{
+			fd: fd
+			is_opened: true
 		}
 	}
   */

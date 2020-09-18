@@ -9,11 +9,9 @@ import rand
 #flag freebsd -I @VROOT/thirdparty/stdatomic/nix
 #flag solaris -I @VROOT/thirdparty/stdatomic/nix
 
-$if linux {
-	$if tinyc {
-		// most Linux distributions have /usr/lib/libatomic.so, but Ubuntu uses gcc version specific dir
-		#flag -L/usr/lib/gcc/x86_64-linux-gnu/8 -L/usr/lib/gcc/x86_64-linux-gnu/9 -latomic
-	}
+$if linux && tinyc {
+	// most Linux distributions have /usr/lib/libatomic.so, but Ubuntu uses gcc version specific dir
+	#flag -L/usr/lib/gcc/x86_64-linux-gnu/8 -L/usr/lib/gcc/x86_64-linux-gnu/9 -latomic
 }
 
 #include <atomic.h>

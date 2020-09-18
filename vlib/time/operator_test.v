@@ -12,17 +12,14 @@ fn test_now_always_results_in_greater_time() {
 	$if macos {
 		assert_greater_time(1, t1)
 		return
-	}
-	$if windows {
+	} $else $if windows {
 		// Lower resolution of time for windows
 		assert_greater_time(15, t1)
 		return
-	}
-	$if linux {
+	} $else $if linux {
 		assert_greater_time(1, t1)
 		return
-	}
-	$if solaris {
+	} $else $if solaris {
 		assert_greater_time(1, t1)
 		return
 	}

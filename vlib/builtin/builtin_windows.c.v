@@ -86,11 +86,9 @@ fn builtin_init() {
 fn print_backtrace_skipping_top_frames(skipframes int) bool {
 	$if msvc {
 		return print_backtrace_skipping_top_frames_msvc(skipframes)
-	}
-	$if tinyc {
+	} $else $if tinyc {
 		return print_backtrace_skipping_top_frames_tcc(skipframes)
-	}
-	$if mingw {
+	} $else $if mingw {
 		return print_backtrace_skipping_top_frames_mingw(skipframes)
 	}
 	eprintln('print_backtrace_skipping_top_frames is not implemented')

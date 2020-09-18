@@ -93,14 +93,11 @@ fn C.time(t &C.time_t) C.time_t
 pub fn now() Time {
 	$if macos {
 		return darwin_now()
-	}
-	$if windows {
+	} $else $if windows {
 		return win_now()
-	}
-	$if solaris {
+	} $else $if solaris {
 		return solaris_now()
-	}
-	$if linux {
+	} $else $if linux {
 		return linux_now()
 	}
 	// defaults to most common feature, the microsecond precision is not available
@@ -114,14 +111,11 @@ pub fn now() Time {
 pub fn utc() Time {
 	$if macos {
 		return darwin_utc()
-	}
-	$if windows {
+	} $else $if windows {
 		return win_utc()
-	}
-	$if solaris {
+	} $else $if solaris {
 		return solaris_utc()
-	}
-	$if linux {
+	} $else $if linux {
 		return linux_utc()
 	}
 	// defaults to most common feature, the microsecond precision is not available

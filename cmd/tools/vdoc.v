@@ -118,11 +118,9 @@ fn slug(title string) string {
 fn open_url(url string) {
 	$if windows {
 		os.system('start $url')
-	}
-	$if macos {
+	} $else $if macos {
 		os.system('open $url')
-	}
-	$if linux {
+	} $else $if linux {
 		os.system('xdg-open $url')
 	}
 }

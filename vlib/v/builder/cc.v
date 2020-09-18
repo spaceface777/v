@@ -168,26 +168,24 @@ fn (mut v Builder) cc() {
 	// TODO if -cc = cc, TCC is still used, default compiler should be
 	// used instead.
 	if v.pref.fast {
-		$if linux {
-			$if !android {
-				tcc_3rd := '$vdir/thirdparty/tcc/bin/tcc'
-				// println('tcc third "$tcc_3rd"')
-				tcc_path := '/var/tmp/tcc/bin/tcc'
-				if os.exists(tcc_3rd) && !os.exists(tcc_path) {
-					// println('moving tcc')
-					// if there's tcc in thirdparty/, that means this is
-					// a prebuilt V_linux.zip.
-					// Until the libtcc1.a bug is fixed, we neeed to move
-					// it to /var/tmp/
-					os.system('mv $vdir/thirdparty/tcc /var/tmp/')
-				}
-				if v.pref.ccompiler == 'cc' && os.exists(tcc_path) {
-					// TODO tcc bug, needs an empty libtcc1.a fila
-					// os.mkdir('/var/tmp/tcc/lib/tcc/') or { panic(err) }
-					// os.create('/var/tmp/tcc/lib/tcc/libtcc1.a')
-					v.pref.ccompiler = tcc_path
-					args << '-m64'
-				}
+		$if linux && !android {
+			tcc_3rd := '$vdir/thirdparty/tcc/bin/tcc'
+			// println('tcc third "$tcc_3rd"')
+			tcc_path := '/var/tmp/tcc/bin/tcc'
+			if os.exists(tcc_3rd) && !os.exists(tcc_path) {
+				// println('moving tcc')
+				// if there's tcc in thirdparty/, that means this is
+				// a prebuilt V_linux.zip.
+				// Until the libtcc1.a bug is fixed, we neeed to move
+				// it to /var/tmp/
+				os.system('mv $vdir/thirdparty/tcc /var/tmp/')
+			}
+			if v.pref.ccompiler == 'cc' && os.exists(tcc_path) {
+				// TODO tcc bug, needs an empty libtcc1.a fila
+				// os.mkdir('/var/tmp/tcc/lib/tcc/') or { panic(err) }
+				// os.create('/var/tmp/tcc/lib/tcc/libtcc1.a')
+				v.pref.ccompiler = tcc_path
+				args << '-m64'
 			}
 		} $else {
 			verror('-fast is only supported on Linux right now')
@@ -572,12 +570,10 @@ fn (mut v Builder) cc() {
 			println('upx failed')
 			$if macos {
 				println('install upx with `brew install upx`')
-			}
-			$if linux {
+			} $else $if linux {
 				println('install upx\n' +
 					'for example, on Debian/Ubuntu run `sudo apt install upx`')
-			}
-			$if windows {
+			} $else $if windows {
 				// :)
 			}
 		}
@@ -706,8 +702,7 @@ fn (mut c Builder) cc_windows_cross() {
 		println('Cross compilation for Windows failed. Make sure you have mingw-w64 installed.')
 		$if macos {
 			println('brew install mingw-w64')
-		}
-		$if linux {
+		} $else $if linux {
 			println('Try `sudo apt install -y mingw-w64` on Debian based distros, or `sudo pacman -S mingw-w64-gcc` on Arch, etc...')
 		}
 		exit(1)
@@ -778,11 +773,9 @@ fn (mut v Builder) build_thirdparty_obj_file(path string, moduleflags []cflag.CF
 fn missing_compiler_info() string {
 	$if windows {
 		return 'https://github.com/vlang/v/wiki/Installing-a-C-compiler-on-Windows'
-	}
-	$if linux {
+	} $else $if linux {
 		return 'On Debian/Ubuntu, run `sudo apt install build-essential`'
-	}
-	$if macos {
+	} $else $if macos {
 		return 'Install command line XCode tools with `xcode-select --install`'
 	}
 	return ''

@@ -111,14 +111,12 @@ pub fn mkdir(path string) ?bool {
 	*/
 	apath := real_path(path)
 	/*
-	$if linux {
-		$if !android {
-			ret := C.syscall(sys_mkdir, apath.str, 511)
-			if ret == -1 {
-				return error(posix_get_error_msg(C.errno))
-			}
-			return true
+	$if linux && !android {
+		ret := C.syscall(sys_mkdir, apath.str, 511)
+		if ret == -1 {
+			return error(posix_get_error_msg(C.errno))
 		}
+		return true
 	}
 	*/
 	r := unsafe {
@@ -178,11 +176,9 @@ pub fn (mut f File) close() {
 	}
 	f.is_opened = false
 	/*
-	$if linux {
-		$if !android {
-			C.syscall(sys_close, f.fd)
-			return
-		}
+	$if linux && !android {
+		C.syscall(sys_close, f.fd)
+		return
 	}
 	*/
 	C.fflush(f.cfile)

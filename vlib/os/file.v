@@ -27,11 +27,9 @@ pub fn (mut f File) write(s string) ?int {
 		return error('file is not opened')
 	}
 	/*
-	$if linux {
-		$if !android {
-			C.syscall(sys_write, f.fd, s.str, s.len)
-			return
-		}
+	$if linux && !android {
+		C.syscall(sys_write, f.fd, s.str, s.len)
+		return
 	}
 	*/
 	written := C.fwrite(s.str, s.len, 1, f.cfile)
@@ -46,12 +44,10 @@ pub fn (mut f File) writeln(s string) ?int {
 		return error('file is not opened')
 	}
 	/*
-	$if linux {
-		$if !android {
-			snl := s + '\n'
-			C.syscall(sys_write, f.fd, snl.str, snl.len)
-			return
-		}
+	$if linux && !android {
+		snl := s + '\n'
+		C.syscall(sys_write, f.fd, snl.str, snl.len)
+		return
 	}
 	*/
 	// TODO perf

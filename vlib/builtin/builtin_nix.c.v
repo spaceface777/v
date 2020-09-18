@@ -27,17 +27,13 @@ fn print_backtrace_skipping_top_frames(xskipframes int) bool {
 	skipframes := xskipframes + 2
 	$if macos {
 		return print_backtrace_skipping_top_frames_mac(skipframes)
-	}
-	$if linux {
+	} $else $if linux {
 		return print_backtrace_skipping_top_frames_linux(skipframes)
-	}
-	$if freebsd {
+	} $else $if freebsd {
 		return print_backtrace_skipping_top_frames_freebsd(skipframes)
-	}
-	$if netbsd {
+	} $else $if netbsd {
 		return print_backtrace_skipping_top_frames_freebsd(skipframes)
-	}
-	$if openbsd {
+	} $else $if openbsd {
 		return print_backtrace_skipping_top_frames_freebsd(skipframes)
 	}
 	println('print_backtrace_skipping_top_frames is not implemented. skipframes: $skipframes')

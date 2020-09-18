@@ -118,35 +118,15 @@ pub fn (o OS) str() string {
 }
 
 pub fn get_host_os() OS {
-	$if linux {
-		return .linux
-	}
-	$if ios {
-		return .ios
-	}
-	$if macos {
-		return .mac
-	}
-	$if windows {
-		return .windows
-	}
-	$if freebsd {
-		return .freebsd
-	}
-	$if openbsd {
-		return .openbsd
-	}
-	$if netbsd {
-		return .netbsd
-	}
-	$if dragonfly {
-		return .dragonfly
-	}
-	$if solaris {
-		return .solaris
-	}
-	$if haiku {
-		return .haiku
-	}
+	$if linux           { return linux }
+	$else $if ios       { return ios }
+	$else $if macos     { return mac }
+	$else $if windows   { return windows }
+	$else $if freebsd   { return freebsd }
+	$else $if openbsd   { return openbsd }
+	$else $if netbsd    { return netbsd }
+	$else $if dragonfly { return dragonfly }
+	$else $if solaris   { return solaris }
+	$else $if haiku     { return .haiku }
 	panic('unknown host OS')
 }

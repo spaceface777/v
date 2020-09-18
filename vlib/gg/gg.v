@@ -323,8 +323,7 @@ pub fn wait_events() {
 			#inMode:NSDefaultRunLoopMode
 			#dequeue:YES];
 			#[NSApp sendEvent:event];
-		}
-		$if windows {
+		} $else $if windows {
 			C.WaitMessage()
 		}
 	}

@@ -1,11 +1,9 @@
 import os
 import v.pref
 
-$if windows {
-	$if tinyc {
-		#flag -lAdvapi32
-		#flag -lUser32
-	}
+$if windows && tinyc {
+	#flag -lAdvapi32
+	#flag -lUser32
 }
 
 fn main(){

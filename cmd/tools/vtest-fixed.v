@@ -59,20 +59,17 @@ fn main() {
 	}
 	$if !linux {
 		tsession.skip_files << skip_on_non_linux
-	}
-	$if linux {
+	} $else {
 		tsession.skip_files << skip_on_linux
 	}
 	$if windows {
 		tsession.skip_files << skip_on_windows
-	}
-	$if !windows {
+	} $else {
 		tsession.skip_files << skip_on_non_windows
 	}
 	$if macos {
 		tsession.skip_files << skip_on_macos
-	}
-	$if !macos {
+	} $else {
 		tsession.skip_files << skip_on_non_macos
 	}
 	tsession.test()
