@@ -7,7 +7,7 @@ fn main() {
 		if n % 5 == 0 {
 			s += 'Buzz'
 		}
-		if s == '' {
+		if s.len == 0 {
 			println(n)
 		}
 		else {

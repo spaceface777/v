@@ -204,7 +204,7 @@ pub fn (mut p Parser) parse_any_type(language table.Language, is_ptr, check_dot 
 		if !p.tok.lit[0].is_capital() {
 			p.error('imported types must start with a capital letter')
 		}
-	} else if p.expr_mod != '' {
+	} else if p.expr_mod.len != 0 {
 		name = p.expr_mod + '.' + name
 	} else if p.mod != 'builtin' && name !in p.table.type_idxs && name.len > 1 {
 		// `Foo` in module `mod` means `mod.Foo`
@@ -238,7 +238,7 @@ pub fn (mut p Parser) parse_any_type(language table.Language, is_ptr, check_dot 
 			defer {
 				p.next()
 			}
-			if name == '' {
+			if name.len == 0 {
 				// This means the developer is using some wrong syntax like `x: int` instead of `x int`
 				p.error('bad type syntax')
 			}

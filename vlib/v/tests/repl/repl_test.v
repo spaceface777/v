@@ -8,7 +8,7 @@ import sync
 fn test_the_v_compiler_can_be_invoked() {
 	vexec := runner.full_path_to_v(5)
 	println('vexecutable: $vexec')
-	assert vexec != ''
+	assert vexec.len != 0
 	vcmd := '"$vexec" -version'
 	r := os.exec(vcmd) or {
 		panic(err)

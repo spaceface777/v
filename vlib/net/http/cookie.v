@@ -48,7 +48,7 @@ pub fn read_set_cookies(h map[string][]string) []&Cookie {
 	mut cookies := []&Cookie{}
 	for _, line in cookies_s {
 		mut parts := line.trim_space().split(';')
-		if parts.len == 1 && parts[0] == '' {
+		if parts.len == 1 && parts[0].len == 0 {
 			continue
 		}
 		parts[0] = parts[0].trim_space()
@@ -179,7 +179,7 @@ pub fn read_cookies(h map[string][]string, filter string) []&Cookie {
 			if !is_cookie_name_valid(name) {
 				continue
 			}
-			if filter != '' && filter != name {
+			if filter.len != 0 && filter != name {
 				continue
 			}
 			val = parse_cookie_value(val, true) or {
@@ -403,7 +403,7 @@ fn parse_cookie_value(_raw string, allow_double_quote bool) ?string {
 }
 
 fn is_cookie_name_valid(name string) bool {
-	if name == '' {
+	if name.len == 0 {
 		return false
 	}
 	for b in name {

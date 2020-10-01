@@ -326,7 +326,7 @@ pub fn parse_args(args []string) (&Preferences, string) {
 						continue
 					}
 				} else {
-					if command == '' {
+					if command.len == 0 {
 						command = arg
 						command_pos = i
 					}

@@ -67,7 +67,7 @@ pub fn (am AssetManager) include_js(combine bool) string {
 }
 
 fn (am AssetManager) combine(asset_type string, to_file bool) string {
-	if am.cache_dir == '' {
+	if am.cache_dir.len == 0 {
 		panic('vweb.assets: you must set a cache dir.')
 	}
 	cache_key := am.get_cache_key(asset_type)

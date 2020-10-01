@@ -8,7 +8,7 @@ import v.util
 import strings
 
 pub fn (node &FnDecl) modname() string {
-	if node.mod != '' {
+	if node.mod.len != 0 {
 		return node.mod
 	}
 	mut pamod := node.name.all_before_last('.')

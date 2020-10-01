@@ -32,11 +32,11 @@ struct FTConfig {
 }
 
 fn new_ft(c FTConfig) ?&FT{
-	if c.font_path == '' {
+	if c.font_path.len == 0 {
 		// Load default font
 	}
 	$if !android {
-		if c.font_path == '' || !os.exists(c.font_path) {
+		if c.font_path.len == 0 || !os.exists(c.font_path) {
 			println('failed to load font "$c.font_path"')
 			return none
 		}
@@ -175,7 +175,7 @@ pub fn (ctx &Context) text_size(s string) (int, int) {
 
 pub fn system_font_path() string {
 	env_font := os.getenv('VUI_FONT')
-	if env_font != '' && os.exists(env_font) {
+	if env_font.len != 0 && os.exists(env_font) {
 		return env_font
 	}
 	$if windows {

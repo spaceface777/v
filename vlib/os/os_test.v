@@ -418,7 +418,7 @@ fn test_is_executable_writable_readable() {
 
 fn test_ext() {
 	assert os.file_ext('file.v') == '.v'
-	assert os.file_ext('file') == ''
+	assert os.file_ext('file').len == 0
 }
 
 fn test_is_abs() {

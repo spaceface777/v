@@ -359,13 +359,13 @@ pub fn (fs FlagParser) usage() string {
 	if no_arguments { adesc = '' }
 
 	mut use := ''
-	if fs.application_version != '' {
+	if fs.application_version.len != 0 {
 		use += '$fs.application_name $fs.application_version\n'
 		use += '$underline\n'
 	}
 	use += 'Usage: ${fs.application_name} [options] $adesc\n'
 	use += '\n'
-	if fs.application_description != '' {
+	if fs.application_description.len != 0 {
 		use += 'Description:\n'
 		use += '$fs.application_description'
 		use += '\n\n'
@@ -395,7 +395,7 @@ pub fn (fs FlagParser) usage() string {
 			if f.abbr != 0 {
 				onames << '-${f.abbr.str()}'
 			}
-			if f.name != '' {
+			if f.name.len != 0 {
 				if !f.val_desc.contains('<bool>') {
 					onames << '--${f.name} $f.val_desc'
 				}else{

@@ -31,7 +31,7 @@ pub fn (mut r Readline) read_line_utf8(prompt string) ?ustring {
 
   r.previous_lines[0] = ''.ustring()
   r.search_index = 0
-  if r.current.s == '' {
+  if r.current.s.len == 0 {
     return error('empty line')
   }
   return r.current

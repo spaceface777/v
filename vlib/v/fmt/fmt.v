@@ -368,11 +368,11 @@ pub fn (mut f Fmt) stmt(node ast.Stmt) {
 		}
 		ast.ForInStmt {
 			f.write('for ')
-			if it.key_var != '' {
+			if it.key_var.len != 0 {
 				f.write(it.key_var)
 			}
-			if it.val_var != '' {
-				if it.key_var != '' {
+			if it.val_var.len != 0 {
+				if it.key_var.len != 0 {
 					f.write(', ')
 				}
 				f.write(it.val_var)
@@ -851,7 +851,7 @@ pub fn (mut f Fmt) expr(node ast.Expr) {
 			if true {
 			} else {
 			}
-			if node.name == 'it' && f.it_name != '' {
+			if node.name == 'it' && f.it_name.len != 0 {
 				f.write(f.it_name)
 			} else if node.kind == .blank_ident {
 				f.write('_')
@@ -952,7 +952,7 @@ pub fn (mut f Fmt) expr(node ast.Expr) {
 			f.writeln('select {')
 			f.indent++
 			for branch in node.branches {
-				if branch.comment.text != '' {
+				if branch.comment.text.len != 0 {
 					f.comment(branch.comment, {
 						inline: true
 					})
@@ -994,7 +994,7 @@ pub fn (mut f Fmt) expr(node ast.Expr) {
 		ast.SizeOf {
 			if node.is_type {
 				f.write('sizeof(')
-				if node.type_name != '' {
+				if node.type_name.len != 0 {
 					if f.is_external_name(node.type_name) {
 						f.write(node.type_name)
 					} else {
@@ -1216,7 +1216,7 @@ pub fn (mut f Fmt) comment(node ast.Comment, options CommentsOptions) {
 	if !node.text.contains('\n') {
 		is_separate_line := !options.inline || node.text.starts_with('|')
 		mut s := if node.text.starts_with('|') { node.text[1..] } else { node.text }
-		if s == '' {
+		if s.len == 0 {
 			s = '//'
 		} else {
 			s = '// ' + s
@@ -1294,7 +1294,7 @@ pub fn (mut f Fmt) short_module(name string) string {
 	mname := vals[vals.len - 2]
 	symname := vals[vals.len - 1]
 	aname := f.mod2alias[mname]
-	if aname == '' {
+	if aname.len == 0 {
 		return symname
 	}
 	return '${aname}.$symname'
@@ -1544,9 +1544,9 @@ pub fn (mut f Fmt) match_expr(it ast.MatchExpr) {
 		f.it_name = ident.name
 	} else if it.cond is ast.SelectorExpr {
 		// `x.y as z`
-		// if ident.name != it.var_name && it.var_name != '' {
+		// if ident.name != it.var_name && it.var_name.len != 0 {
 	}
-	if it.var_name != '' && f.it_name != it.var_name {
+	if it.var_name.len != 0 && f.it_name != it.var_name {
 		f.write(' as $it.var_name')
 	}
 	f.writeln(' {')
@@ -1570,7 +1570,7 @@ pub fn (mut f Fmt) match_expr(it ast.MatchExpr) {
 		}
 	}
 	for branch in it.branches {
-		if branch.comment.text != '' {
+		if branch.comment.text.len != 0 {
 			f.comment(branch.comment, {
 				inline: true
 			})
@@ -1822,7 +1822,7 @@ pub fn (mut f Fmt) struct_init(it ast.StructInit) {
 		f.write('$name{}')
 	} else if it.is_short {
 		// `Foo{1,2,3}` (short syntax )
-		// if name != '' {
+		// if name.len != 0 {
 		f.write('$name{')
 		// }
 		for i, field in it.fields {

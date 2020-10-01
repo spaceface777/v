@@ -57,7 +57,7 @@ fn opendiff_exists() bool {
 }
 
 pub fn color_compare_files(diff_cmd, file1, file2 string) string {
-	if diff_cmd != '' {
+	if diff_cmd.len != 0 {
 		full_cmd := '$diff_cmd --minimal --text --unified=2 ' +
 			' --show-function-line="fn " "$file1" "$file2" '
 		x := os.exec(full_cmd) or {

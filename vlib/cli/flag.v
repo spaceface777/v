@@ -118,13 +118,13 @@ fn (mut flag Flag) parse(args []string, with_abbrev bool) ?[]string {
 // check if first arg matches flag
 fn (mut flag Flag) matches(args []string, with_abbrev bool) bool {
 	if with_abbrev {
-		return (flag.name != '' && args[0] == '--$flag.name') ||
-			(flag.name != '' && args[0].starts_with('--$flag.name=')) ||
-			(flag.abbrev != '' && args[0] == '-$flag.abbrev') ||
-			(flag.abbrev != '' && args[0].starts_with('-$flag.abbrev='))
+		return (flag.name.len != 0 && args[0] == '--$flag.name') ||
+			(flag.name.len != 0 && args[0].starts_with('--$flag.name=')) ||
+			(flag.abbrev.len != 0 && args[0] == '-$flag.abbrev') ||
+			(flag.abbrev.len != 0 && args[0].starts_with('-$flag.abbrev='))
 	} else {
-		return (flag.name != '' && args[0] == '-$flag.name') ||
-			(flag.name != '' && args[0].starts_with('-$flag.name='))
+		return (flag.name.len != 0 && args[0] == '-$flag.name') ||
+			(flag.name.len != 0 && args[0].starts_with('-$flag.name='))
 	}
 }
 
@@ -174,7 +174,7 @@ fn (flags []Flag) contains(name string) bool {
 fn (flags []Flag) have_abbrev() bool {
 	mut have_abbrev := false
 	for flag in flags {
-		if flag.abbrev != '' {
+		if flag.abbrev.len != 0 {
 			have_abbrev = true
 		}
 	}

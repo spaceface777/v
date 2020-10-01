@@ -74,7 +74,7 @@ pub fn (mut c Client) reconnect() ? {
 // send sends an email
 pub fn (c Client) send(config Mail) ? {
 	if !c.is_open { return error('Disconnected from server') }
-	from := if config.from != '' { config.from } else { c.from }
+	from := if config.from.len != 0 { config.from } else { c.from }
 	c.send_mailfrom(from) or { return error('Sending mailfrom failed') }
 	c.send_mailto(config.to) or { return error('Sending mailto failed') }
 	c.send_data() or { return error('Sending mail data failed') }

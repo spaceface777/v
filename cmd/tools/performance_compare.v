@@ -84,7 +84,7 @@ fn (c Context) compare_versions() {
 
 fn (c &Context) prepare_v(cdir string, commit string) {
 	mut cc := os.getenv('CC')
-	if cc == '' {
+	if cc.len == 0 {
 		cc = 'cc'
 	}
 	mut vgit_context := vgit.VGitContext{

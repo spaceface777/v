@@ -129,7 +129,7 @@ pub fn delete(url string) ?Response {
 }
 
 pub fn fetch(_url string, config FetchConfig) ?Response {
-	if _url == '' {
+	if _url.len == 0 {
 		return error('http.fetch: empty url')
 	}
 	url := build_url_from_fetch(_url, config) or {
@@ -334,7 +334,7 @@ fn parse_response(resp string) Response {
 		headers[key] = tval
 		lheaders[lkey] = tval
 	}
-	if lheaders['transfer-encoding'] == 'chunked' || lheaders['content-length'] == '' {
+	if lheaders['transfer-encoding'] == 'chunked' || lheaders['content-length'].len == 0 {
 		text = chunked.decode(text)
 	}
 	return Response{
@@ -377,7 +377,7 @@ fn (req &Request) build_request_cookies_header() string {
 	for key, val in req.cookies {
 		cookie << '$key=$val'
 	}
-	if 'Cookie' in req.headers && req.headers['Cookie'] != '' {
+	if 'Cookie' in req.headers && req.headers['Cookie'].len != 0 {
 		cookie << req.headers['Cookie']
 	}
 	return 'Cookie: ' + cookie.join('; ') + '\r\n'

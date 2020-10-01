@@ -186,7 +186,7 @@ fn (s &Scanner) ident_fn_name() string {
 	if s.current_column() - 2 != 0 {
 		return s.fn_name
 	}
-	has_struct_name := s.struct_name != ''
+	has_struct_name := s.struct_name.len != 0
 	if has_struct_name {
 		for pos < s.text.len && s.text[pos] != `(` {
 			pos++
@@ -660,7 +660,7 @@ fn (mut s Scanner) text_scan() token.Token {
 		// if s.comments_mode == .parse_comments {
 		// println('\nscan()')
 		// }
-		// if s.line_comment != '' {
+		// if s.line_comment.len != 0 {
 		// s.fgenln('// LC "$s.line_comment"')
 		// s.line_comment = ''
 		// }
@@ -1341,7 +1341,7 @@ fn (mut s Scanner) debug_tokens() {
 		tok_kind := tok.kind
 		lit := tok.lit
 		print(tok_kind.str())
-		if lit != '' {
+		if lit.len != 0 {
 			println(' `$lit`')
 		} else {
 			println('')

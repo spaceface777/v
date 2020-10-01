@@ -34,7 +34,7 @@ pub fn (mut b Builder) write_b(data byte) {
 
 [inline]
 pub fn (mut b Builder) write(s string) {
-	if s == '' {
+	if s.len == 0 {
 		return
 	}
 	b.buf.push_many(s.str, s.len)

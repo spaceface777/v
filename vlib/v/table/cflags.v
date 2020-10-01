@@ -21,7 +21,7 @@ pub fn (mut table Table) parse_cflag(cflg, mod string, ctimedefines []string) ?b
 	allowed_flags := ['framework', 'library', 'Wa', 'Wl', 'Wp', 'I', 'l', 'L']
 	flag_orig := cflg.trim_space()
 	mut flag := flag_orig
-	if flag == '' {
+	if flag.len == 0 {
 		return none
 	}
 	mut fos := ''
@@ -72,7 +72,7 @@ pub fn (mut table Table) parse_cflag(cflg, mod string, ctimedefines []string) ?b
 		if index == -1 {
 			value = flag.trim_space()
 		}
-		if (name in ['-I', '-l', '-L']) && value == '' {
+		if (name in ['-I', '-l', '-L']) && value.len == 0 {
 			hint := if name == '-l' { 'library name' } else { 'path' }
 			return error('bad #flag `$flag_orig`: missing $hint after `$name`')
 		}

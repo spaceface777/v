@@ -1089,7 +1089,7 @@ pub fn (mut p Parser) name_expr() ast.Expr {
 	} else if p.peek_tok.kind == .dot && (lit0_is_capital && !known_var && language == .v) {
 		// `Color.green`
 		mut enum_name := p.check_name()
-		if mod != '' {
+		if mod.len != 0 {
 			enum_name = mod + '.' + enum_name
 		} else {
 			enum_name = p.prepend_mod(enum_name)

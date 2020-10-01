@@ -53,7 +53,7 @@ fn test_vlib_fmt() {
 		if expected_ocontent != result_ocontent {
 			fmt_bench.fail()
 			eprintln(fmt_bench.step_message_fail('file ${ipath} after formatting, does not look as expected.'))
-			if diff_cmd == '' {
+			if diff_cmd.len == 0 {
 				eprintln('>> sorry, but no working "diff" CLI command can be found')
 				continue
 			}

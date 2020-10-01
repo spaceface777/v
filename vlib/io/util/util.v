@@ -17,7 +17,7 @@ pub struct TempFileOptions {
 // temp_file returns an uniquely named, open, writable, `os.File` and it's path
 pub fn temp_file(tfo TempFileOptions) ?(os.File, string) {
 	mut d := tfo.path
-	if d == '' {
+	if d.len == 0 {
 		d = os.temp_dir()
 	}
 	os.is_writable_folder(d) or {
@@ -55,7 +55,7 @@ pub struct TempDirOptions {
 // temp_dir returns an uniquely named, writable, directory path
 pub fn temp_dir(tdo TempFileOptions) ?string {
 	mut d := tdo.path
-	if d == '' {
+	if d.len == 0 {
 		d = os.temp_dir()
 	}
 	os.is_writable_folder(d) or {

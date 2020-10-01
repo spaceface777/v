@@ -71,12 +71,12 @@ fn test_at_mod() {
 
 fn test_at_struct() {
 	// Test @STRUCT
-	assert @STRUCT == ''
+	assert @STRUCT.len == 0
 	mut ts := TestStruct { test: "test" }
 	ts.test_struct()
 	r1 := ts.test_struct_w_return()
 	r2 := ts.test_struct_w_high_order(fn(i int)string{
-		assert @STRUCT == ''
+		assert @STRUCT.len == 0
 		return i.str()
 	})
 	assert r1 == 'test'

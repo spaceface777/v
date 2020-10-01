@@ -326,7 +326,7 @@ fn (mut d Doc) generate_from_ast(file_ast ast.File, orig_mod_name string) {
 				if module_comment in ['', d.head.comment] {
 					continue
 				}
-				if d.head.comment != '' {
+				if d.head.comment.len != 0 {
 					d.head.comment += '\n'
 				}
 				d.head.comment += module_comment
@@ -337,7 +337,7 @@ fn (mut d Doc) generate_from_ast(file_ast ast.File, orig_mod_name string) {
 			// the accumulated comments were interspersed before/between the imports;
 			// just add them all to the module comment:
 			import_comments := merge_comments(prev_comments)
-			if d.head.comment != '' {
+			if d.head.comment.len != 0 {
 				d.head.comment += '\n'
 			}
 			d.head.comment += import_comments

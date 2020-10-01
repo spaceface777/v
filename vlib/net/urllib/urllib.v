@@ -27,7 +27,7 @@ const (
 
 fn error_msg(message, val string) string {
 	mut msg := 'net.urllib.$message'
-	if val != '' {
+	if val.len != 0 {
 		msg = '$msg ($val)'
 	}
 	return msg
@@ -154,7 +154,7 @@ fn unescape(s_ string, mode EncodingMode) ?string {
 		x := s[i]
 		match x {
 		`%` {
-			if s == '' {
+			if s.len == 0 {
 				break
 			}
 			n++
@@ -362,7 +362,7 @@ pub:
 }
 
 fn (u &Userinfo) empty() bool {
-	return u.username == '' && u.password == ''
+	return u.username.len == 0 && u.password.len == 0
 }
 
 // string returns the encoded userinfo information in the standard form
@@ -440,7 +440,7 @@ pub fn parse(rawurl string) ?URL {
 	mut url := parse_url(u, false) or {
 		return error(error_msg(err_msg_parse, u))
 	}
-	if frag == '' {
+	if frag.len == 0 {
 		return url
 	}
 	f := unescape(frag, .encode_fragment) or {
@@ -467,7 +467,7 @@ fn parse_url(rawurl string, via_request bool) ?URL {
 	if string_contains_ctl_byte(rawurl) {
 		return error(error_msg('parse_url: invalid control character in URL', rawurl))
 	}
-	if rawurl == '' && via_request {
+	if rawurl.len == 0 && via_request {
 		return error(error_msg('parse_url: empty URL', rawurl))
 	}
 	mut url := URL{
@@ -494,7 +494,7 @@ fn parse_url(rawurl string, via_request bool) ?URL {
 		url.raw_query = raw_query
 	}
 	if !rest.starts_with('/') {
-		if url.scheme != '' {
+		if url.scheme.len != 0 {
 			// We consider rootless paths per RFC 3986 as opaque.
 			url.opaque = rest
 			return url
@@ -519,7 +519,7 @@ fn parse_url(rawurl string, via_request bool) ?URL {
 			return error(error_msg('parse_url: first path segment in URL cannot contain colon', ''))
 		}
 	}
-	if ((url.scheme != '' || !via_request) && !rest.starts_with('///')) && rest.starts_with('//') {
+	if ((url.scheme.len != 0 || !via_request) && !rest.starts_with('///')) && rest.starts_with('//') {
 		authority,r := split(rest[2..], `/`, false)
 		rest = r
 		a := parse_authority(authority)?
@@ -659,7 +659,7 @@ pub fn (mut u URL) set_path(p string) ?bool {
 // In general, code should call escaped_path instead of
 // reading u.raw_path directly.
 fn (u &URL) escaped_path() string {
-	if u.raw_path != '' && valid_encoded_path(u.raw_path) {
+	if u.raw_path.len != 0 && valid_encoded_path(u.raw_path) {
 		unescape(u.raw_path, .encode_path) or {
 			return ''
 		}
@@ -703,7 +703,7 @@ fn valid_encoded_path(s string) bool {
 // valid_optional_port reports whether port is either an empty string
 // or matches /^:\d*$/
 fn valid_optional_port(port string) bool {
-	if port == '' {
+	if port.len == 0 {
 		return true
 	}
 	if port[0] != `:` {
@@ -740,28 +740,28 @@ fn valid_optional_port(port string) bool {
 // - if u.fragment is empty, #fragment is omitted.
 pub fn (u URL) str() string {
 	mut buf := strings.new_builder(200)
-	if u.scheme != '' {
+	if u.scheme.len != 0 {
 		buf.write(u.scheme)
 		buf.write(':')
 	}
-	if u.opaque != '' {
+	if u.opaque.len != 0 {
 		buf.write(u.opaque)
 	}
 	else {
-		if u.scheme != '' || u.host != '' || (u.user != 0 && !u.user.empty()) {
-			if u.host != '' || u.path != '' || !u.user.empty() {
+		if u.scheme.len != 0 || u.host.len != 0 || (u.user != 0 && !u.user.empty()) {
+			if u.host.len != 0 || u.path.len != 0 || !u.user.empty() {
 				buf.write('//')
 			}
 			if !u.user.empty() {
 				buf.write(u.user.str())
 				buf.write('@')
 			}
-			if u.host != '' {
+			if u.host.len != 0 {
 				buf.write(escape(u.host, .encode_host))
 			}
 		}
 		path := u.escaped_path()
-		if path != '' && path[0] != `/` && u.host != '' {
+		if path.len != 0 && path[0] != `/` && u.host.len != 0 {
 			buf.write('/')
 		}
 		if buf.len == 0 {
@@ -778,11 +778,11 @@ pub fn (u URL) str() string {
 		}
 		buf.write(path)
 	}
-	if u.force_query || u.raw_query != '' {
+	if u.force_query || u.raw_query.len != 0 {
 		buf.write('?')
 		buf.write(u.raw_query)
 	}
-	if u.fragment != '' {
+	if u.fragment.len != 0 {
 		buf.write('#')
 		buf.write(escape(u.fragment, .encode_fragment))
 	}
@@ -819,7 +819,7 @@ fn parse_query_silent(query string) Values {
 fn parse_query_values(mut m Values, query string) ?bool {
 	mut had_error := false
 	mut q := query
-	for q != '' {
+	for q.len != 0 {
 		mut key := q
 		mut i := key.index_any('&;')
 		if i >= 0 {
@@ -829,7 +829,7 @@ fn parse_query_values(mut m Values, query string) ?bool {
 		else {
 			q = ''
 		}
-		if key == '' {
+		if key.len == 0 {
 			continue
 		}
 		mut value := ''
@@ -887,7 +887,7 @@ pub fn (v Values) encode() string {
 // them to base, per RFC 3986.
 fn resolve_path(base, ref string) string {
 	mut full := ''
-	if ref == '' {
+	if ref.len == 0 {
 		full = base
 	}
 	else if ref[0] != `/` {
@@ -899,7 +899,7 @@ fn resolve_path(base, ref string) string {
 	else {
 		full = ref
 	}
-	if full == '' {
+	if full.len == 0 {
 		return ''
 	}
 	mut dst := []string{}
@@ -929,7 +929,7 @@ fn resolve_path(base, ref string) string {
 // is_abs reports whether the URL is absolute.
 // Absolute means that it has a non-empty scheme.
 pub fn (u &URL) is_abs() bool {
-	return u.scheme != ''
+	return u.scheme.len != 0
 }
 
 // parse parses a URL in the context of the receiver. The provided URL
@@ -948,25 +948,25 @@ pub fn (u &URL) parse(ref string) ?URL {
 // ignores base and returns a copy of ref.
 pub fn (u &URL) resolve_reference(ref &URL) ?URL {
 	mut url := *ref
-	if ref.scheme == '' {
+	if ref.scheme.len == 0 {
 		url.scheme = u.scheme
 	}
-	if ref.scheme != '' || ref.host != '' || !ref.user.empty() {
+	if ref.scheme.len != 0 || ref.host.len != 0 || !ref.user.empty() {
 		// The 'absoluteURI' or 'net_path' cases.
 		// We can ignore the error from set_path since we know we provided a
 		// validly-escaped path.
 		url.set_path(resolve_path(ref.escaped_path(), ''))?
 		return url
 	}
-	if ref.opaque != '' {
+	if ref.opaque.len != 0 {
 		url.user = user('')
 		url.host = ''
 		url.path = ''
 		return url
 	}
-	if ref.path == '' && ref.raw_query == '' {
+	if ref.path.len == 0 && ref.raw_query.len == 0 {
 		url.raw_query = u.raw_query
-		if ref.fragment == '' {
+		if ref.fragment.len == 0 {
 			url.fragment = u.fragment
 		}
 	}
@@ -989,9 +989,9 @@ pub fn (u &URL) query() Values {
 // string that would be used in an HTTP request for u.
 pub fn (u &URL) request_uri() string {
 	mut result := u.opaque
-	if result == '' {
+	if result.len == 0 {
 		result = u.escaped_path()
-		if result == '' {
+		if result.len == 0 {
 			result = '/'
 		}
 	}
@@ -1000,7 +1000,7 @@ pub fn (u &URL) request_uri() string {
 			result = u.scheme + ':' + result
 		}
 	}
-	if u.force_query || u.raw_query != '' {
+	if u.force_query || u.raw_query.len != 0 {
 		result += '?' + u.raw_query
 	}
 	return result

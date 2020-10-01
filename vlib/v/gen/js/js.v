@@ -400,12 +400,12 @@ fn get_ns(s string) string {
 
 fn (mut g JsGen) get_alias(name string) string {
 	ns := get_ns(name)
-	if ns == '' {
+	if ns.len == 0 {
 		return name
 	}
 	imports := g.namespace_imports[g.namespace]
 	alias := imports[ns]
-	if alias == '' {
+	if alias.len == 0 {
 		return name
 	}
 	return alias + '.' + name.split('.').last()

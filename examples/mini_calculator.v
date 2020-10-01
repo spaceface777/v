@@ -8,7 +8,7 @@ const (
 
 // Convert expression to Reverse Polish Notation.
 fn expr_to_rev_pol(expr string) ?[]string {
-	if expr == '' {
+	if expr.len == 0 {
 		return error('err: empty expression')
 	}
 	mut stack := []string{}

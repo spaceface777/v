@@ -71,7 +71,7 @@ fn (cmd Command) help_message() string {
 		}
 	}
 	help += '\n'
-	if cmd.description != '' {
+	if cmd.description.len != 0 {
 		help += '\n$cmd.description\n'
 	}
 	mut abbrev_len := 0
@@ -96,7 +96,7 @@ fn (cmd Command) help_message() string {
 		help += '\nFlags:\n'
 		for flag in cmd.flags {
 			mut flag_name := ''
-			if flag.abbrev != '' && cmd.flags.have_abbrev() {
+			if flag.abbrev.len != 0 && cmd.flags.have_abbrev() {
 				abbrev_indent := ' '.repeat(abbrev_len - flag.abbrev.len - 1) // - 1 for '-' in front
 				flag_name = '-$flag.abbrev$abbrev_indent--$flag.name'
 			} else if cmd.flags.have_abbrev() {

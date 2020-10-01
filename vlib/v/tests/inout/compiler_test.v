@@ -76,7 +76,7 @@ fn test_all() {
 			println(expected)
 			println(term.header('found:', '-'))
 			println(found)
-			if diff_cmd != '' {
+			if diff_cmd.len != 0 {
 				println(term.header('difference:', '-'))
 				println(util.color_compare_strings(diff_cmd, expected, found))
 			} else {

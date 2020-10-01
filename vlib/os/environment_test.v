@@ -20,7 +20,7 @@ fn test_setenv() {
 fn test_unsetenv() {
 	os.setenv('foo', 'bar', true)
 	os.unsetenv('foo')
-	assert os.getenv('foo') == ''
+	assert os.getenv('foo').len == 0
 }
 
 fn test_environ() {
@@ -28,9 +28,9 @@ fn test_environ() {
 	os.setenv('myvar2', 'bar2', true)
 	assert os.getenv('myvar1') == 'bar1'
 	assert os.getenv('myvar2') == 'bar2'
-	assert os.getenv('myvar_not_defined') == ''
+	assert os.getenv('myvar_not_defined').len == 0
 	all := os.environ()
 	assert all['myvar1'] == 'bar1'
 	assert all['myvar2'] == 'bar2'
-	assert all['myvar_not_defined'] == ''
+	assert all['myvar_not_defined'].len == 0
 }

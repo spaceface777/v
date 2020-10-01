@@ -87,7 +87,7 @@ fn main() {
 		exit(2)
 	}
 	ecc := os.getenv('CC')
-	if ecc != '' {
+	if ecc.len != 0 {
 		context.cc = ecc
 	}
 	if context.cleanup {

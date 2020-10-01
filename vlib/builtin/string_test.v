@@ -188,7 +188,7 @@ fn test_split() {
 	assert vals[0] == 'l'
 	assert vals[1] == 'l'
 	assert vals[2] == 'l'
-	assert vals[3] == ''
+	assert vals[3].len == 0
 	// /////////
 	s = 'awesome'
 	a := s.split('')
@@ -345,17 +345,17 @@ fn test_runes() {
 fn test_left_right() {
 	s := 'ALOHA'
 	assert s.left(3) == 'ALO'
-	assert s.left(0) == ''
+	assert s.left(0).len == 0
 	assert s.left(8) == s
 	assert s.right(3) == 'HA'
-	assert s.right(6) == ''
+	assert s.right(6).len == 0
 	assert s[3..] == 'HA'
 	u := s.ustring()
 	assert u.left(3) == 'ALO'
-	assert u.left(0) == ''
+	assert u.left(0).len == 0
 	assert s.left(8) == s
 	assert u.right(3) == 'HA'
-	assert u.right(6) == ''
+	assert u.right(6).len == 0
 }
 
 fn test_contains() {
@@ -441,7 +441,7 @@ fn test_hash() {
 }
 
 fn test_trim() {
-	assert 'banana'.trim('bna') == ''
+	assert 'banana'.trim('bna').len == 0
 	assert 'abc'.trim('ac') == 'b'
 	assert 'aaabccc'.trim('ac') == 'b'
 }
@@ -454,7 +454,7 @@ fn test_trim_left() {
 	// test cutset
 	s = 'banana'
 	assert s.trim_left('ba') == 'nana'
-	assert s.trim_left('ban') == ''
+	assert s.trim_left('ban').len == 0
 }
 
 fn test_trim_right() {
@@ -465,7 +465,7 @@ fn test_trim_right() {
 	// test cutset
 	s = 'banana'
 	assert s.trim_right('na') == 'b'
-	assert s.trim_right('ban') == ''
+	assert s.trim_right('ban').len == 0
 }
 
 fn test_all_before() {
@@ -494,7 +494,7 @@ fn test_all_after() {
 
 fn test_reverse() {
 	assert 'hello'.reverse() == 'olleh'
-	assert ''.reverse() == ''
+	assert ''.reverse().len == 0
 	assert 'a'.reverse() == 'a'
 }
 
@@ -577,7 +577,7 @@ fn test_capitalize() {
 	assert s.capitalize() == 'I am ray'
 	s = ''
 	assert !s.is_capital()
-	assert s.capitalize() == ''
+	assert s.capitalize().len == 0
 	s = 'TEST IT'
 	assert !s.is_capital()
 	assert s.capitalize() == 'TEST IT'
@@ -666,15 +666,15 @@ fn test_limit() {
 	s := 'hello'
 	assert s.limit(2) == 'he'
 	assert s.limit(9) == s
-	assert s.limit(0) == ''
-	// assert s.limit(-1) == ''
+	assert s.limit(0).len == 0
+	// assert s.limit(-1).len == 0
 }
 
 fn test_repeat() {
 	s1 := 'V! '
 	assert s1.repeat(5) == 'V! V! V! V! V! '
 	assert s1.repeat(1) == s1
-	assert s1.repeat(0) == ''
+	assert s1.repeat(0).len == 0
 	s2 := ''
 	assert s2.repeat(5) == s2
 	assert s2.repeat(1) == s2

@@ -127,10 +127,10 @@ fn run_repl(workdir string, vrepl_prefix string) {
 			break
 		}
 		line := oline.trim_space()
-		if line == '' && oline.ends_with('\n') {
+		if line.len == 0 && oline.ends_with('\n') {
 			continue
 		}
-		if line.len <= -1 || line == '' || line == 'exit' {
+		if line.len <= -1 || line.len == 0 || line == 'exit' {
 			break
 		}
 		r.line = line
@@ -219,7 +219,7 @@ fn run_repl(workdir string, vrepl_prefix string) {
 			if oline.starts_with('  ') {
 				is_statement = true
 			}
-			if !is_statement && !func_call && r.line != '' {
+			if !is_statement && !func_call && r.line.len != 0 {
 				temp_line = 'println($r.line)'
 				temp_flag = true
 			}

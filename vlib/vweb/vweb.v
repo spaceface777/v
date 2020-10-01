@@ -149,7 +149,7 @@ pub fn (mut ctx Context) set_cookie_with_expire_date(key, val string, expire_dat
 
 pub fn (ctx &Context) get_cookie(key string) ?string { // TODO refactor
 	mut cookie_header := ctx.get_header('cookie')
-	if cookie_header == '' {
+	if cookie_header.len == 0 {
 		cookie_header = ctx.get_header('Cookie')
 	}
 	cookie_header = ' ' + cookie_header
@@ -160,7 +160,7 @@ pub fn (ctx &Context) get_cookie(key string) ?string { // TODO refactor
 	} else {
 		cookie_header.find_between(' $key=', '\r')
 	}
-	if cookie != '' {
+	if cookie.len != 0 {
 		return cookie.trim_space()
 	}
 	return error('Cookie not found')
@@ -260,7 +260,7 @@ fn handle_conn<T>(conn net.Socket, mut app T) {
 		//println(j)
 		line := conn.read_line()
 		sline := strip(line)
-		if sline == '' {
+		if sline.len == 0 {
 			//if in_headers {
 				// End of headers, no body => exit
 				if len == 0 {
@@ -332,7 +332,7 @@ fn handle_conn<T>(conn net.Socket, mut app T) {
 	static_file := app.vweb.static_files[static_file_name]
 	mime_type := app.vweb.static_mime_types[static_file_name]
 
-	if static_file != '' && mime_type != '' {
+	if static_file.len != 0 && mime_type.len != 0 {
 		data := os.read_file(static_file) or {
 			conn.send_string(http_404) or {}
 			return
@@ -350,7 +350,7 @@ fn handle_conn<T>(conn net.Socket, mut app T) {
 	//t := time.ticks()
 	//mut action := ''
 	mut route_words_a := [][]string{}
-	mut url_words := vals[1][1..].split('/').filter(it != '')
+	mut url_words := vals[1][1..].split('/').filter(it.len != 0)
 
 
 	if url_words.len == 0 {
@@ -467,7 +467,7 @@ fn handle_conn<T>(conn net.Socket, mut app T) {
 			}
 		}
 	}
-	if action == '' {
+	if action.len == 0 {
 		// site not found
 		conn.send_string(http_404) or {}
 		return
@@ -561,13 +561,13 @@ pub fn (mut ctx Context) serve_static(url, file_path, mime_type string) {
 
 pub fn (ctx &Context) ip() string {
 	mut ip := ctx.req.headers['X-Forwarded-For']
-	if ip == '' {
+	if ip.len == 0 {
 		ip = ctx.req.headers['X-Real-IP']
 	}
 	if ip.contains(',') {
 		ip = ip.all_before(',')
 	}
-	if ip == '' {
+	if ip.len == 0 {
 		ip = ctx.conn.peer_ip() or { '' }
 	}
 	return ip

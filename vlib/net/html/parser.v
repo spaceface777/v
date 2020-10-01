@@ -156,7 +156,7 @@ pub fn (mut parser Parser) split_parse(data string) {
 				parser.lexycal_attributes.open_string = 0
 				parser.lexycal_attributes.write_lexeme(word)
 				temp_lexeme := parser.builder_str()
-				if parser.lexycal_attributes.current_tag.last_attribute != '' {
+				if parser.lexycal_attributes.current_tag.last_attribute.len != 0 {
 					lattr := parser.lexycal_attributes.current_tag.last_attribute
 					nval := temp_lexeme.substr(1, temp_lexeme.len - 1)
 					// parser.print_debug(lattr + " = " + temp_lexeme)
@@ -185,7 +185,7 @@ pub fn (mut parser Parser) split_parse(data string) {
 					parser.lexycal_attributes.current_tag.closed = true
 				}
 				*/
-				if parser.lexycal_attributes.current_tag.name == '' {
+				if parser.lexycal_attributes.current_tag.name.len == 0 {
 					parser.lexycal_attributes.current_tag.name = complete_lexeme
 				} else if complete_lexeme != '/' {
 					parser.lexycal_attributes.current_tag.attributes[complete_lexeme] = ''
@@ -201,7 +201,7 @@ pub fn (mut parser Parser) split_parse(data string) {
 				parser.lexycal_attributes.write_lexeme(word)
 			} else if word != 10 {
 				complete_lexeme := parser.builder_str().to_lower()
-				if parser.lexycal_attributes.current_tag.name == '' {
+				if parser.lexycal_attributes.current_tag.name.len == 0 {
 					parser.lexycal_attributes.current_tag.name = complete_lexeme
 				} else {
 					parser.lexycal_attributes.current_tag.attributes[complete_lexeme] = ''

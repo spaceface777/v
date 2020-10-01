@@ -387,7 +387,7 @@ pub fn (mut c Checker) struct_decl(decl ast.StructDecl) {
 						lit.pos)
 				}
 			} else if field.default_expr is ast.StringLiteral as lit {
-				if lit.val == '' {
+				if lit.val.len == 0 {
 					c.warn("unnecessary default value of '': struct fields are zeroed by default",
 						lit.pos)
 				}
@@ -885,7 +885,7 @@ fn (mut c Checker) fail_if_immutable(expr ast.Expr) (string, token.Position) {
 							expr.pos)
 					}
 					to_lock, pos = c.fail_if_immutable(expr.expr)
-					if to_lock != '' {
+					if to_lock.len != 0 {
 						// No automatic lock for struct access
 						explicit_lock_needed = true
 					}
@@ -907,7 +907,7 @@ fn (mut c Checker) fail_if_immutable(expr ast.Expr) (string, token.Position) {
 			// TODO: should only work for builtin method
 			if expr.name == 'slice' {
 				to_lock, pos = c.fail_if_immutable(expr.left)
-				if to_lock != '' {
+				if to_lock.len != 0 {
 					// No automatic lock for array slicing (yet(?))
 					explicit_lock_needed = true
 				}
@@ -1114,7 +1114,7 @@ pub fn (mut c Checker) call_method(mut call_expr ast.CallExpr) table.Type {
 	}
 	if method := c.table.type_find_method(left_type_sym, method_name) {
 		if !method.is_pub && !c.is_builtin_mod && !c.pref.is_test && left_type_sym.mod != c.mod &&
-			left_type_sym.mod != '' { // method.mod != c.mod {
+			left_type_sym.mod.len != 0 { // method.mod != c.mod {
 			// If a private method is called outside of the module
 			// its receiver type is defined in, show an error.
 			// println('warn $method_name lef.mod=$left_type_sym.mod c.mod=$c.mod')
@@ -1267,7 +1267,7 @@ pub fn (mut c Checker) call_fn(mut call_expr ast.CallExpr) table.Type {
 		return table.string_type
 	}
 	if call_expr.generic_type.has_flag(.generic) {
-		if c.mod != '' {
+		if c.mod.len != 0 {
 			// Need to prepend the module when adding a generic type to a function
 			// `fn_gen_types['mymod.myfn'] == ['string', 'int']`
 			c.table.register_fn_gen_type(c.mod + '.' + fn_name, c.cur_generic_type)
@@ -3647,7 +3647,7 @@ pub fn (mut c Checker) index_expr(mut node ast.IndexExpr) table.Type {
 // If a short form is used, `expected_type` needs to be an enum
 // with this value.
 pub fn (mut c Checker) enum_val(mut node ast.EnumVal) table.Type {
-	typ_idx := if node.enum_name == '' {
+	typ_idx := if node.enum_name.len == 0 {
 		c.expected_type.idx()
 	} else { //
 		c.table.find_type_idx(node.enum_name)
@@ -3950,7 +3950,7 @@ fn (mut c Checker) fn_decl(mut node ast.FnDecl) {
 		// c.warn('duplicate method `$node.name`', node.pos)
 		// }
 		// Do not allow to modify types from other modules
-		if sym.mod != c.mod && !c.is_builtin_mod && sym.mod != '' { // TODO remove != ''
+		if sym.mod != c.mod && !c.is_builtin_mod && sym.mod.len != 0 { // TODO remove.len != 0
 			// remove the method to hide other related errors (`method is private` etc)
 			mut idx := 0
 			for i, m in sym.methods {

@@ -46,7 +46,7 @@ fn extract_words(contents string) []string {
 	mut results := []string{}
 	for s in splitted {
 		result := filter_word(s)
-		if result == '' {
+		if result.len == 0 {
 			continue
 		}
 		results << result
@@ -57,7 +57,7 @@ fn extract_words(contents string) []string {
 
 // Removes punctuation
 fn filter_word(word string) string {
-	if word == '' || word == ' ' {
+	if word.len == 0 || word == ' ' {
 		return ''
 	}
 	mut i := 0

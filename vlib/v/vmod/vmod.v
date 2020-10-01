@@ -84,7 +84,7 @@ fn (mut mcache ModFileCacher) traverse(mfolder string) ([]string, ModFileAndFold
 		if levels > 255 {
 			break
 		}
-		if cfolder == '/' || cfolder == '' {
+		if cfolder == '/' || cfolder.len == 0 {
 			break
 		}
 		if cfolder in mcache.cache {

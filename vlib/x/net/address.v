@@ -19,7 +19,7 @@ const (
 
 fn new_addr(addr C.sockaddr, _saddr string, _port int) ?Addr {
 	mut saddr := _saddr
-	if saddr == '' {
+	if saddr.len == 0 {
 		// Convert to string representation
 		buf := []byte{ len: max_ipv4_addr_len, init: 0 }
 		$if windows {

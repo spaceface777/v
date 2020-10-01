@@ -237,7 +237,7 @@ fn (mut cb Clipboard) transmit_selection(xse &C.XSelectionEvent) bool {
 	if xse.target == cb.get_atom(.targets) {
 		targets := cb.get_supported_targets()
 		C.XChangeProperty(xse.display, xse.requestor, xse.property, cb.get_atom(.xa_atom), 32, C.PropModeReplace, targets.data, targets.len)
-	} else if cb.is_supported_target(xse.target) && cb.is_owner && cb.text != "" {
+	} else if cb.is_supported_target(xse.target) && cb.is_owner && cb.text.len != 0 {
 		cb.mutex.m_lock()
 		C.XChangeProperty(xse.display, xse.requestor, xse.property, xse.target, 8, C.PropModeReplace, cb.text.str, cb.text.len)
 		cb.mutex.unlock()

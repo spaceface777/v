@@ -78,7 +78,7 @@ pub fn (mut w Writer) write(record []string) ?bool {
 // }
 
 fn (w &Writer) field_needs_quotes(field string) bool {
-	if field == '' {
+	if field.len == 0 {
 		return false
 	}
 	if field.contains(w.delimiter.str()) || (field.index_any('"\r\n') != -1) {

@@ -158,7 +158,7 @@ fn test_parse_expr() {
 	lines := res.trim_space().split_into_lines()
 	mut i := 0
 	for line in lines {
-		if line == '' {
+		if line.len == 0 {
 			continue
 		}
 		if line != expecting[i] {

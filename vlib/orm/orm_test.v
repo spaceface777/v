@@ -176,7 +176,7 @@ fn test_orm_sqlite() {
 	no_user := sql db {
 		select from User where id == 30
 	}
-	assert no_user.name == '' // TODO optional
+	assert no_user.name.len == 0 // TODO optional
 	assert no_user.age == 0
 	//
 	two_users := sql db {
@@ -224,7 +224,7 @@ fn test_orm_pg() {
 /*
 	dbname := os.getenv('VDB_NAME')
 	dbuser := os.getenv('VDB_USER')
-	if dbname == '' || dbuser == '' {
+	if dbname.len == 0 || dbuser.len == 0 {
 		eprintln(term.red('NB: this test requires VDB_NAME and VDB_USER env variables to be set'))
 		return
 	}
@@ -253,7 +253,7 @@ fn test_orm_pg() {
 
 
 	nr_modules := db.select count from Modules
-		where id > 1 && name == ''
+		where id > 1 && name.len == 0
 	println(nr_modules)
 
 	nr_modules := db.select count from modules

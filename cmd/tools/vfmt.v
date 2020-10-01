@@ -42,7 +42,7 @@ const (
 )
 
 fn main() {
-	// if os.getenv('VFMT_ENABLE') == '' {
+	// if os.getenv('VFMT_ENABLE').len == 0 {
 	// eprintln('v fmt is disabled for now')
 	// exit(1)
 	// }

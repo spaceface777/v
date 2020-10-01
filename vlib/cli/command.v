@@ -126,7 +126,7 @@ fn (mut cmd Command) add_default_flags() {
 		use_help_abbrev := !cmd.flags.contains('h') && cmd.flags.have_abbrev()
 		cmd.add_flag(help_flag(use_help_abbrev))
 	}
-	if !cmd.disable_version && cmd.version != '' && !cmd.flags.contains('version') {
+	if !cmd.disable_version && cmd.version.len != 0 && !cmd.flags.contains('version') {
 		use_version_abbrev := !cmd.flags.contains('v') && cmd.flags.have_abbrev()
 		cmd.add_flag(version_flag(use_version_abbrev))
 	}
@@ -136,7 +136,7 @@ fn (mut cmd Command) add_default_commands() {
 	if !cmd.disable_help && !cmd.commands.contains('help') && cmd.is_root() {
 		cmd.add_command(help_cmd())
 	}
-	if !cmd.disable_version && cmd.version != '' && !cmd.commands.contains('version') {
+	if !cmd.disable_version && cmd.version.len != 0 && !cmd.commands.contains('version') {
 		cmd.add_command(version_cmd())
 	}
 }
@@ -228,7 +228,7 @@ fn (cmd Command) check_help_flag() {
 }
 
 fn (cmd Command) check_version_flag() {
-	if !cmd.disable_version && cmd.version != '' && cmd.flags.contains('version') {
+	if !cmd.disable_version && cmd.version.len != 0 && cmd.flags.contains('version') {
 		version_flag := cmd.flags.get_bool('version') or {
 			return
 		} // ignore error and handle command normally
@@ -244,7 +244,7 @@ fn (cmd Command) check_version_flag() {
 
 fn (cmd Command) check_required_flags() {
 	for flag in cmd.flags {
-		if flag.required && flag.value == '' {
+		if flag.required && flag.value.len == 0 {
 			full_name := cmd.full_name()
 			println('Flag `$flag.name` is required by `$full_name`')
 			exit(1)

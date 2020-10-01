@@ -35,7 +35,7 @@ fn (mut a App) collect_info() {
 	}
 	if os_kind == 'linux' {
 		info := a.cpu_info()
-		if info['model name'] != '' {
+		if info['model name'].len != 0 {
 			arch_details << info['model name']
 		} else {
 			arch_details << info['hardware']
@@ -89,11 +89,11 @@ fn (mut a App) collect_info() {
 	a.line('is vroot writable', is_writable_vroot.str())
 	a.line('V full version', util.full_v_version(true))
 	vtmp := os.getenv('VTMP')
-	if vtmp != '' {
+	if vtmp.len != 0 {
 		a.line('env VTMP', '"$vtmp"')
 	}
 	vflags := os.getenv('VFLAGS')
-	if vflags != '' {
+	if vflags.len != 0 {
 		a.line('env VFLAGS', '"$vflags"')
 	}
 	a.println('')
@@ -158,7 +158,7 @@ fn (mut a App) get_linux_os_name() string {
 				lines := os.read_file('/etc/os-release') or { continue }
 				vals := a.parse(lines, '=')
 
-				if vals['PRETTY_NAME'] == '' { continue }
+				if vals['PRETTY_NAME'].len == 0 { continue }
 				os_details = vals['PRETTY_NAME']
 				break
 			}

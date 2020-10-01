@@ -71,7 +71,7 @@ pub fn (conn Connection) select_db(dbname string) ?bool {
 // resulting in only changing the user and not selecting a database.
 pub fn (conn Connection) change_user(username, password, dbname string) ?bool {
 	mut ret := true
-	if dbname != '' {
+	if dbname.len != 0 {
 		ret = C.mysql_change_user(conn.conn, username.str, password.str, dbname.str)
 	} else {
 		ret = C.mysql_change_user(conn.conn, username.str, password.str, 0)

@@ -20,7 +20,7 @@ pub fn new_preferences() Preferences {
 }
 
 pub fn (mut p Preferences) fill_with_defaults() {
-	if p.vroot == '' {
+	if p.vroot.len == 0 {
 		// Location of all vlib files
 		p.vroot = os.dir(vexe_path())
 	}
@@ -32,10 +32,10 @@ pub fn (mut p Preferences) fill_with_defaults() {
 		p.lookup_path[i] = path.replace('@vlib', vlib_path).replace('@vmodules', default_module_path)
 	}
 	rpath := os.real_path(p.path)
-	if p.out_name == '' {
+	if p.out_name.len == 0 {
 		filename := os.file_name(rpath).trim_space()
 		mut base := filename.all_before_last('.')
-		if base == '' {
+		if base.len == 0 {
 			// The file name is just `.v` or `.vsh` or `.*`
 			base = filename
 		}
@@ -56,14 +56,14 @@ pub fn (mut p Preferences) fill_with_defaults() {
 		// No OS specifed? Use current system
 		p.os = get_host_os()
 	}
-	if p.ccompiler == '' {
+	if p.ccompiler.len == 0 {
 		p.ccompiler = default_c_compiler()
 	}
 	p.ccompiler_type = cc_from_string(p.ccompiler)
 	p.is_test = p.path.ends_with('_test.v')
 	p.is_vsh = p.path.ends_with('.vsh')
 	p.is_script = p.is_vsh || p.path.ends_with('.v') || p.path.ends_with('.vv')
-	if p.third_party_option == '' {
+	if p.third_party_option.len == 0 {
 		p.third_party_option = p.cflags
 		$if !windows {
 			if !p.third_party_option.contains('-fPIC') {
@@ -87,7 +87,7 @@ fn default_c_compiler() string {
 
 pub fn vexe_path() string {
 	vexe := os.getenv('VEXE')
-	if vexe != '' {
+	if vexe.len != 0 {
 		return vexe
 	}
 	real_vexe_path := os.real_path(os.executable())

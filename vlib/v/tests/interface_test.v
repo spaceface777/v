@@ -8,14 +8,14 @@ mut:
 }
 
 fn (mut c Cat) name() string {
-	if c.breed != '' {
+	if c.breed.len != 0 {
 		assert c.breed == 'Persian'
 	}
 	return 'Cat'
 }
 
 fn (c &Cat) speak(s string) {
-	if c.breed != '' {
+	if c.breed.len != 0 {
 		assert c.breed == 'Persian'
 	}
 	assert s == 'Hi !'

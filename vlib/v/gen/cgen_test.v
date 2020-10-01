@@ -42,8 +42,8 @@ fn test_c_files() {
 fn compare_texts(a, b, path string) bool {
 	lines_a_ := a.trim_space().split_into_lines()
 	lines_b_ := b.trim_space().split_into_lines()
-	lines_a := lines_a_.filter(it != '')
-	mut lines_b := lines_b_.filter(it != '')
+	lines_a := lines_a_.filter(it.len != 0)
+	mut lines_b := lines_b_.filter(it.len != 0)
 	lines_b << ''
 	lines_b << ''
 	/*

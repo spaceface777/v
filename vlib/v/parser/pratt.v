@@ -187,7 +187,7 @@ pub fn (mut p Parser) expr(precedence int) ast.Expr {
 					node = p.struct_init(true) // short_syntax: true
 				} else if p.tok.kind == .name {
 					p.next()
-					lit := if p.tok.lit != '' { p.tok.lit } else { p.tok.kind.str() }
+					lit := if p.tok.lit.len != 0 { p.tok.lit } else { p.tok.kind.str() }
 					p.error('unexpected `$lit`, expecting `:`')
 				} else {
 					p.error('unexpected `$p.tok.lit`, expecting struct key')

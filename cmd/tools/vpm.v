@@ -162,7 +162,7 @@ fn vpm_install(module_names []string) {
 			continue
 		}
 		mut vcs := mod.vcs
-		if vcs == '' {
+		if vcs.len == 0 {
 			vcs = supported_vcs_systems[0]
 		}
 		if vcs !in supported_vcs_systems {

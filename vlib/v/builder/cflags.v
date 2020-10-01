@@ -10,7 +10,7 @@ fn (v &Builder) get_os_cflags() []cflag.CFlag {
 		ctimedefines << v.pref.compile_defines
 	}
 	for flag in v.table.cflags {
-		if flag.os == '' ||
+		if flag.os.len == 0 ||
 			(flag.os == 'linux' && v.pref.os == .linux) ||
 			(flag.os == 'macos' && v.pref.os == .macos) ||
 			(flag.os == 'darwin' && v.pref.os == .macos) ||

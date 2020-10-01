@@ -80,8 +80,8 @@ pub fn (mut b Builder) compile_c() {
 	b.build_c(files, out_name_c)
 	if b.pref.os == .ios {
 		bundle_name := b.pref.out_name.split('/').last()
-		bundle_id := if b.pref.bundle_id != '' { b.pref.bundle_id } else { 'app.vlang.$bundle_name' }
-		display_name := if b.pref.display_name != '' { b.pref.display_name } else { bundle_name }
+		bundle_id := if b.pref.bundle_id.len != 0 { b.pref.bundle_id } else { 'app.vlang.$bundle_name' }
+		display_name := if b.pref.display_name.len != 0 { b.pref.display_name } else { bundle_name }
 		os.mkdir('$display_name\.app')
 		os.write_file('$display_name\.app/Info.plist', make_ios_plist(display_name, bundle_id, bundle_name, 1))
 	}

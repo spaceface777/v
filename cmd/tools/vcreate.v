@@ -93,7 +93,7 @@ fn (c &Create) create_git_repo(dir string) {
 fn create() {
 	mut c := Create{}
 	c.name = os.input('Input your project name: ')
-	if c.name == '' {
+	if c.name.len == 0 {
 		cerror('project name cannot be empty')
 		exit(1)
 	}

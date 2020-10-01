@@ -668,7 +668,7 @@ fn (cfg DocConfig) get_readme(path string) string {
 			break
 		}
 	}
-	if fname == '' {
+	if fname.len == 0 {
 		return ''
 	}
 	readme_path := os.join_path(path, '${fname}.md')

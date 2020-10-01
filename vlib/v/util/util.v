@@ -268,12 +268,12 @@ pub fn replace_op(s string) string {
 
 pub fn join_env_vflags_and_os_args() []string {
 	vosargs := os.getenv('VOSARGS')
-	if vosargs != '' {
+	if vosargs.len != 0 {
 		return non_empty(vosargs.split(' '))
 	}
 	mut args := []string{}
 	vflags := os.getenv('VFLAGS')
-	if vflags != '' {
+	if vflags.len != 0 {
 		args << os.args[0]
 		args << vflags.split(' ')
 		if os.args.len > 1 {
@@ -285,7 +285,7 @@ pub fn join_env_vflags_and_os_args() []string {
 }
 
 fn non_empty(arg []string) []string {
-	return arg.filter(it != '')
+	return arg.filter(it.len != 0)
 }
 
 pub fn check_module_is_installed(modulename string, is_verbose bool) ?bool {

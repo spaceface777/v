@@ -49,7 +49,7 @@ pub fn (mut app App) new() vweb.Result {
 pub fn (mut app App) new_article() vweb.Result {
 	title := app.vweb.form['title']
 	text := app.vweb.form['text']
-	if title == '' || text == '' {
+	if title.len == 0 || text.len == 0 {
 		app.vweb.text('Empty text/title')
 		return vweb.Result{}
 	}

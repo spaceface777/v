@@ -648,7 +648,7 @@ pub fn file_ext(path string) string {
 // dir returns a single separator.
 // The returned path does not end in a separator unless it is the root directory.
 pub fn dir(path string) string {
-	if path == '' {
+	if path.len == 0 {
 		return '.'
 	}
 	mut pos := path.last_index(path_separator) or {
@@ -665,7 +665,7 @@ pub fn dir(path string) string {
 // If the path is empty, base returns ".". If the path consists entirely of separators, base returns a
 // single separator.
 pub fn base(path string) string {
-	if path == '' {
+	if path.len == 0 {
 		return '.'
 	}
 	if path == path_separator {
@@ -1295,7 +1295,7 @@ pub fn cache_dir() string {
 	// or empty, a default equal to $HOME/.cache should be used.
 	$if !windows {
 		xdg_cache_home := os.getenv('XDG_CACHE_HOME')
-		if xdg_cache_home != '' {
+		if xdg_cache_home.len != 0 {
 			return xdg_cache_home
 		}
 	}
@@ -1312,26 +1312,26 @@ pub fn cache_dir() string {
 pub fn temp_dir() string {
 	mut path := os.getenv('TMPDIR')
 	$if windows {
-		if path == '' {
+		if path.len == 0 {
 			// TODO see Qt's implementation?
 			// https://doc.qt.io/qt-5/qdir.html#tempPath
 			// https://github.com/qt/qtbase/blob/e164d61ca8263fc4b46fdd916e1ea77c7dd2b735/src/corelib/io/qfilesystemengine_win.cpp#L1275
 			path = os.getenv('TEMP')
-			if path == '' {
+			if path.len == 0 {
 				path = os.getenv('TMP')
 			}
-			if path == '' {
+			if path.len == 0 {
 				path = 'C:/tmp'
 			}
 		}
 	}
 	$if android {
 		// TODO test+use '/data/local/tmp' on Android before using cache_dir()
-		if path == '' {
+		if path.len == 0 {
 			path = os.cache_dir()
 		}
 	}
-	if path == '' {
+	if path.len == 0 {
 		path = '/tmp'
 	}
 	return path

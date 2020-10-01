@@ -108,7 +108,7 @@ fn gg_init_sokol_window(user_data voidptr) {
 
 	// `os.is_file()` won't work on Android if the font file is embedded into the APK
 	exists := $if !android { os.is_file(g.config.font_path) } $else { true }
-	if g.config.font_path != '' && exists {
+	if g.config.font_path.len != 0 && exists {
 		// t := time.ticks()
 		g.ft = new_ft({
 			font_path: g.config.font_path
@@ -201,7 +201,7 @@ pub fn new_context(cfg Config) &Context {
 		width: cfg.width
 		height: cfg.height
 		config: cfg
-		render_text: cfg.font_path != ''
+		render_text: cfg.font_path.len != 0
 		ft: 0
 	}
 	g.set_bg_color(cfg.bg_color)

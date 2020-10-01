@@ -108,7 +108,7 @@ pub fn (db DB) q_strings(query string) []Row {
 pub fn (db DB) exec(query string) []Row {
 	res := C.PQexec(db.conn, query.str)
 	e := unsafe { C.PQerrorMessage(db.conn).vstring() }
-	if e != '' {
+	if e.len != 0 {
 		println('pg exec error:')
 		println(e)
 		return res_to_rows(res)
@@ -126,7 +126,7 @@ fn rows_first_or_empty(rows []Row) ?Row {
 pub fn (db DB) exec_one(query string) ?Row {
 	res := C.PQexec(db.conn, query.str)
 	e := unsafe { C.PQerrorMessage(db.conn).vstring() }
-	if e != '' {
+	if e.len != 0 {
 		return error('pg exec error: "$e"')
 	}
 	row := rows_first_or_empty( res_to_rows(res) )?
@@ -164,7 +164,7 @@ pub fn (db DB) exec_param(query string, param string) []Row {
 
 fn (db DB) handle_error_or_result(res voidptr, elabel string) []Row {
 	e := unsafe { C.PQerrorMessage(db.conn).vstring() }
-	if e != '' {
+	if e.len != 0 {
 		println('pg $elabel error:')
 		println(e)
 		return res_to_rows(res)
