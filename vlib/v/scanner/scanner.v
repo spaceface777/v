@@ -106,7 +106,7 @@ pub fn new_vet_scanner_file(file_path string, comments_mode CommentsMode, pref &
 		verror("$file_path doesn't exist")
 	}
 	raw_text := util.read_file(file_path) or {
-		verror(err)
+		verror(err.msg)
 		return voidptr(0)
 	}
 	mut s := new_vet_scanner(raw_text, comments_mode, pref)

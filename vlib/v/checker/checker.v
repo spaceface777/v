@@ -1915,7 +1915,7 @@ pub fn (mut c Checker) call_fn(mut call_expr ast.CallExpr) table.Type {
 		*/
 		return f.return_type
 	}
-	// `return error(err)` -> `return err`
+	// `return err` -> `return err`
 	if fn_name == 'error' {
 		arg := call_expr.args[0]
 		call_expr.args[0].typ = c.expr(arg.expr)
@@ -2967,7 +2967,7 @@ pub fn (mut c Checker) array_init(mut array_init ast.ArrayInit) table.Type {
 		if array_init.has_default {
 			default_typ := c.expr(array_init.default_expr)
 			c.check_expected(default_typ, array_init.elem_type) or {
-				c.error(err, array_init.default_expr.position())
+				c.error(err.msg, array_init.default_expr.position())
 			}
 		}
 		if sym.kind == .sum_type {
@@ -3446,7 +3446,7 @@ fn (mut c Checker) hash_stmt(mut node ast.HashStmt) {
 		mut flag := node.main
 		if flag.contains('@VROOT') {
 			vroot := util.resolve_vroot(flag, c.file.path) or {
-				c.error(err, node.pos)
+				c.error(err.msg, node.pos)
 				return
 			}
 			node.val = 'include $vroot'
@@ -3455,7 +3455,7 @@ fn (mut c Checker) hash_stmt(mut node ast.HashStmt) {
 		}
 		if flag.contains('\$env(') {
 			env := util.resolve_env_value(flag, true) or {
-				c.error(err, node.pos)
+				c.error(err.msg, node.pos)
 				return
 			}
 			node.main = env
@@ -3473,15 +3473,15 @@ fn (mut c Checker) hash_stmt(mut node ast.HashStmt) {
 			'--cflags --libs $node.main'.split(' ')
 		}
 		mut m := pkgconfig.main(args) or {
-			c.error(err, node.pos)
+			c.error(err.msg, node.pos)
 			return
 		}
 		cflags := m.run() or {
-			c.error(err, node.pos)
+			c.error(err.msg, node.pos)
 			return
 		}
 		c.table.parse_cflag(cflags, c.mod, c.pref.compile_defines_all) or {
-			c.error(err, node.pos)
+			c.error(err.msg, node.pos)
 			return
 		}
 	} else if node.kind == 'flag' {
@@ -3490,13 +3490,13 @@ fn (mut c Checker) hash_stmt(mut node ast.HashStmt) {
 		// expand `@VROOT` to its absolute path
 		if flag.contains('@VROOT') {
 			flag = util.resolve_vroot(flag, c.file.path) or {
-				c.error(err, node.pos)
+				c.error(err.msg, node.pos)
 				return
 			}
 		}
 		if flag.contains('\$env(') {
 			flag = util.resolve_env_value(flag, true) or {
-				c.error(err, node.pos)
+				c.error(err.msg, node.pos)
 				return
 			}
 		}
@@ -3506,7 +3506,7 @@ fn (mut c Checker) hash_stmt(mut node ast.HashStmt) {
 			}
 		}
 		// println('adding flag "$flag"')
-		c.table.parse_cflag(flag, c.mod, c.pref.compile_defines_all) or { c.error(err, node.pos) }
+		c.table.parse_cflag(flag, c.mod, c.pref.compile_defines_all) or { c.error(err.msg, node.pos) }
 	} else {
 		if node.kind != 'define' {
 			c.error('expected `#define`, `#flag`, `#include` or `#pkgconfig` not $node.val',
@@ -3641,7 +3641,7 @@ pub fn (mut c Checker) expr(node ast.Expr) table.Type {
 			return node.typ.to_ptr()
 		}
 		ast.Assoc {
-			v := node.scope.find_var(node.var_name) or { panic(err) }
+			v := node.scope.find_var(node.var_name) or { panic(err.msg) }
 			for i, _ in node.fields {
 				c.expr(node.exprs[i])
 			}
@@ -3931,7 +3931,7 @@ fn (mut c Checker) comptime_call(mut node ast.ComptimeCall) table.Type {
 	node.sym = c.table.get_type_symbol(c.unwrap_generic(c.expr(node.left)))
 	if node.is_env {
 		env_value := util.resolve_env_value("\$env('$node.args_var')", false) or {
-			c.error(err, node.env_pos)
+			c.error(err.msg, node.env_pos)
 			return table.string_type
 		}
 		node.env_value = env_value
@@ -5009,7 +5009,7 @@ fn (mut c Checker) comp_if_branch(cond ast.Expr, pos token.Position) bool {
 						left_type := c.expr(cond.left)
 						right_type := c.expr(cond.right)
 						expr := c.find_definition(cond.left) or {
-							c.error(err, cond.left.pos)
+							c.error(err.msg, cond.left.pos)
 							return false
 						}
 						if !c.check_types(right_type, left_type) {
@@ -5059,7 +5059,7 @@ fn (mut c Checker) comp_if_branch(cond ast.Expr, pos token.Position) bool {
 					return false
 				}
 				expr := c.find_obj_definition(cond.obj) or {
-					c.error(err, cond.pos)
+					c.error(err.msg, cond.pos)
 					return false
 				}
 				if !c.check_types(typ, table.bool_type) {

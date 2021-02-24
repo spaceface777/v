@@ -28,11 +28,11 @@ fn setup_symlink_unix(vexe string) {
 	if os.system("uname -o | grep -q '[A/a]ndroid'") == 1 {
 		link_dir := '/usr/local/bin'
 		if !os.exists(link_dir) {
-			os.mkdir_all(link_dir) or { panic(err) }
+			os.mkdir_all(link_dir) or { panic(err.msg) }
 		}
 		link_path = link_dir + '/v'
 	}
-	ret := os.exec('ln -sf $vexe $link_path') or { panic(err) }
+	ret := os.exec('ln -sf $vexe $link_path') or { panic(err.msg) }
 	if ret.exit_code == 0 {
 		println('Symlink "$link_path" has been created')
 	} else {
@@ -49,10 +49,10 @@ fn setup_symlink_windows(vexe string) {
 		vsymlinkdir := os.join_path(vdir, '.bin')
 		mut vsymlink := os.join_path(vsymlinkdir, 'v.exe')
 		if !os.exists(vsymlinkdir) {
-			os.mkdir(vsymlinkdir) or { panic(err) } // will panic if fails
+			os.mkdir(vsymlinkdir) or { panic(err.msg) } // will panic if fails
 		} else {
-			os.rmdir(vsymlinkdir) or { panic(err) }
-			os.mkdir(vsymlinkdir) or { panic(err) }
+			os.rmdir(vsymlinkdir) or { panic(err.msg) }
+			os.mkdir(vsymlinkdir) or { panic(err.msg) }
 		}
 		// First, try to create a native symlink at .\.bin\v.exe
 		os.symlink(vsymlink, vexe) or {
@@ -62,9 +62,9 @@ fn setup_symlink_windows(vexe string) {
 			eprintln('Creating a batch file instead...')
 			vsymlink = os.join_path(vsymlinkdir, 'v.bat')
 			if os.exists(vsymlink) {
-				os.rm(vsymlink) or { panic(err) }
+				os.rm(vsymlink) or { panic(err.msg) }
 			}
-			os.write_file(vsymlink, '@echo off\n$vexe %*') or { panic(err) }
+			os.write_file(vsymlink, '@echo off\n$vexe %*') or { panic(err.msg) }
 			eprintln('$vsymlink file written.')
 		}
 		if !os.exists(vsymlink) {
@@ -73,7 +73,7 @@ fn setup_symlink_windows(vexe string) {
 		println('Symlink $vsymlink to $vexe created.')
 		println('Checking system %PATH%...')
 		reg_sys_env_handle := get_reg_sys_env_handle() or {
-			warn_and_exit(err)
+			warn_and_exit(err.msg)
 			return
 		}
 		// TODO: Fix defers inside ifs
@@ -99,7 +99,7 @@ fn setup_symlink_windows(vexe string) {
 			println('System %PATH% was not configured.')
 			println('Adding symlink directory to system %PATH%...')
 			set_reg_value(reg_sys_env_handle, 'Path', new_sys_env_path) or {
-				warn_and_exit(err)
+				warn_and_exit(err.msg)
 				C.RegCloseKey(reg_sys_env_handle)
 				return
 			}

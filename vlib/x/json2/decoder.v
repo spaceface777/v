@@ -104,7 +104,7 @@ fn (mut p Parser) decode() ?Any {
 		return error(p.emit_error('invalid JSON.'))
 	}
 	fi := p.decode_value() or {
-		return error(p.emit_error(err))
+		return error(p.emit_error(err.msg))
 	}
 	if p.tok.kind != .eof {
 		return error(p.emit_error('unknown token `$p.tok.kind`.'))

@@ -5657,7 +5657,7 @@ fn (mut g Gen) or_block(var_name string, or_block ast.OrExpr, return_type table.
 		}
 	} else if or_block.kind == .propagate {
 		if g.file.mod.name == 'main' && (isnil(g.fn_decl) || g.fn_decl.name == 'main.main') {
-			// In main(), an `opt()?` call is sugar for `opt() or { panic(err) }`
+			// In main(), an `opt()?` call is sugar for `opt() or { panic(err.msg) }`
 			if g.pref.is_debug {
 				paline, pafile, pamod, pafn := g.panic_debug_info(or_block.pos)
 				g.writeln('panic_debug($paline, tos3("$pafile"), tos3("$pamod"), tos3("$pafn"), ${cvar_name}.err.msg );')
@@ -5666,7 +5666,7 @@ fn (mut g Gen) or_block(var_name string, or_block ast.OrExpr, return_type table.
 			}
 		} else {
 			// In ordinary functions, `opt()?` call is sugar for:
-			// `opt() or { return error(err) }`
+			// `opt() or { return err }`
 			// Since we *do* return, first we have to ensure that
 			// the defered statements are generated.
 			g.write_defer_stmts()
