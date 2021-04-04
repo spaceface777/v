@@ -9,13 +9,10 @@ on:
       - "**.md"
 
 jobs:
-  test:
+  some-ci-job:
     runs-on: ubuntu-20.04
-    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
-      - name: Build local v
-        run: make -j4
       - name: multiline test script
         run: |
           echo "line 1"
