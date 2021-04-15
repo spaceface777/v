@@ -78,7 +78,7 @@ jobs:
           ./cmd/tools/test_if_v_test_system_works
       - name: Self tests
         run: ./v -silent test-self
-      - name: Self tests (-Werror)
+      - name: Self tests (-cstrict)
         run: ./v -cstrict test-self
       - name: Test time functions in a timezone UTC-12
         run: TZ=Etc/GMT+12 ./v test vlib/time/
@@ -375,8 +375,8 @@ jobs:
           ./v -silent test-self
       - name: Self tests (-prod)
         run: ./v -o vprod -prod cmd/v && ./vprod -silent test-self
-      - name: Self tests (-Werror)
-        run: ./v -cc gcc -cflags "-Werror" test-self
+      - name: Self tests (-cstrict)
+        run: ./v -cc gcc -cflags "-cstrict" test-self
       - name: Build examples
         run: ./v build-examples
       - name: Build tetris.v with -autofree
@@ -460,8 +460,8 @@ jobs:
           ./v -silent test-self
       - name: Self tests (-prod)
         run: ./v -o vprod -prod cmd/v && ./vprod -silent test-self
-      - name: Self tests (-Werror)
-        run: ./v -cflags "-Werror" test-self
+      - name: Self tests (-cstrict)
+        run: ./v -cflags "-cstrict" test-self
       - name: Build examples
         run: ./v build-examples
       - name: Build examples with -autofree
