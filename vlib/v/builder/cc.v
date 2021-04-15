@@ -206,8 +206,8 @@ fn (mut v Builder) setup_ccompiler_options(ccompiler string) {
 		'-Wno-shadow' /* the V compiler already catches this for user code, and enabling this causes issues with e.g. the `it` variable */,
 		'-Wno-int-to-void-pointer-cast',
 		'-Wno-int-to-pointer-cast' /* gcc version of the above */,
-		'-Wno-trigraphs' /* see https://stackoverflow.com/a/8435413 */,
-		'-Wno-missing-braces' /* see https://stackoverflow.com/q/13746033 */,
+		'-Wno-trigraphs' /* see stackoverflow.com/a/8435413 */,
+		'-Wno-missing-braces' /* see stackoverflow.com/q/13746033 */,
 		'-Wno-unknown-warning' /* if a C compiler does not understand a certain flag, it should just ignore it */,
 		'-Wno-unknown-warning-option' /* clang equivalent of the above */,
 		// enable additional warnings:
