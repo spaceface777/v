@@ -376,7 +376,7 @@ jobs:
       - name: Self tests (-prod)
         run: ./v -o vprod -prod cmd/v && ./vprod -silent test-self
       - name: Self tests (-cstrict)
-        run: ./v -cc gcc -cflags "-cstrict" test-self
+        run: ./v -cc gcc -cstrict test-self
       - name: Build examples
         run: ./v build-examples
       - name: Build tetris.v with -autofree
@@ -461,7 +461,7 @@ jobs:
       - name: Self tests (-prod)
         run: ./v -o vprod -prod cmd/v && ./vprod -silent test-self
       - name: Self tests (-cstrict)
-        run: ./v -cflags "-cstrict" test-self
+        run: ./v -cstrict test-self
       - name: Build examples
         run: ./v build-examples
       - name: Build examples with -autofree
