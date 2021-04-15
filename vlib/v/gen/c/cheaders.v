@@ -178,7 +178,7 @@ string _STR_TMP(const char *fmt, ...) {
 '
 	c_common_macros                 = '
 #define EMPTY_VARG_INITIALIZATION 0
-#define EMPTY_STRUCT_DECLARATION
+#define EMPTY_STRUCT_DECLARATION char __dummy
 #define EMPTY_STRUCT_INITIALIZATION 0
 // Due to a tcc bug, the length of an array needs to be specified, but GCC crashes if it is...
 #define EMPTY_ARRAY_OF_ELEMS(x,n) (x[])
@@ -212,9 +212,7 @@ string _STR_TMP(const char *fmt, ...) {
 #endif
 
 #ifdef __TINYC__
-	#undef EMPTY_STRUCT_DECLARATION
 	#undef EMPTY_STRUCT_INITIALIZATION
-	#define EMPTY_STRUCT_DECLARATION char _dummy
 	#define EMPTY_STRUCT_INITIALIZATION 0
 	#undef EMPTY_ARRAY_OF_ELEMS
 	#define EMPTY_ARRAY_OF_ELEMS(x,n) (x[n])
@@ -654,10 +652,7 @@ static voidptr memfreedup(voidptr ptr, voidptr src, int sz) {
 		#define _Atomic volatile
 
 		// MSVC cannot parse some things properly
-		#undef EMPTY_STRUCT_DECLARATION
 		#undef OPTION_CAST
-
-		#define EMPTY_STRUCT_DECLARATION int ____dummy_variable
 		#define OPTION_CAST(x)
 		#undef __NOINLINE
 		#undef __IRQHANDLER
