@@ -78,8 +78,8 @@ jobs:
           ./cmd/tools/test_if_v_test_system_works
       - name: Self tests
         run: ./v -silent test-self
-      - name: Self tests (-cstrict)
-        run: ./v -cstrict test-self
+      - name: Self tests (-Werror)
+        run: ./v -cflags -Werror test-self
       - name: Test time functions in a timezone UTC-12
         run: TZ=Etc/GMT+12 ./v test vlib/time/
       - name: Test time functions in a timezone UTC-3
