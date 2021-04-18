@@ -3704,6 +3704,7 @@ fn (mut c Checker) for_in_stmt(mut node ast.ForInStmt) {
 		} else {
 			node.val_type = high_type
 		}
+		node.scope.update_var_type(node.val_var, node.val_type)
 	} else {
 		sym := c.table.get_type_symbol(typ)
 		if sym.kind == .struct_ {
