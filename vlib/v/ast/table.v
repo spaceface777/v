@@ -1261,7 +1261,7 @@ pub fn (mut t Table) resolve_generic_to_concrete(generic_type Type, generic_name
 				return new_type(idx).derive(generic_type).clear_flag(.generic)
 			}
 		}
-		Struct {
+		Struct, Interface {
 			if sym.info.is_generic {
 				mut nrt := '$sym.name<'
 				for i in 0 .. sym.info.generic_types.len {

@@ -1855,14 +1855,15 @@ fn (p &Parser) is_typename(t token.Token) bool {
 // 7. otherwise, it's not generic
 // see also test_generic_detection in vlib/v/tests/generics_test.v
 fn (p &Parser) is_generic_call() bool {
-	lit0_is_capital := if p.tok.kind != .eof && p.tok.lit.len > 0 {
-		p.tok.lit[0].is_capital()
-	} else {
-		false
-	}
-	if lit0_is_capital || p.peek_tok.kind != .lt {
+	if p.peek_tok.kind != .lt {
 		return false
 	}
+	// lit0_is_capital := if p.tok.kind != .eof && p.tok.lit.len > 0 {
+	// 	p.tok.lit[0].is_capital()
+	// } else {
+	// 	false
+	// }
+	// if lit0_is_capital() &&
 	tok2 := p.peek_token(2)
 	tok3 := p.peek_token(3)
 	tok4 := p.peek_token(4)

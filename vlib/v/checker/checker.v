@@ -636,12 +636,19 @@ pub fn (mut c Checker) struct_decl(mut decl ast.StructDecl) {
 	}
 }
 
-fn (mut c Checker) unwrap_generic_struct(struct_type ast.Type, generic_names []string, concrete_types []ast.Type) ast.Type {
-	ts := c.table.get_type_symbol(struct_type)
-	if ts.info is ast.Struct {
-		if ts.info.is_generic {
-			mut nrt := '$ts.name<'
-			mut c_nrt := '${ts.cname}_T_'
+fn (mut c Checker) unwrap_generic_type(kind ast.Kind, typ ast.Type, generic_names []string, concrete_types []ast.Type) ast.Type {
+	mut final_concrete_types := []ast.Type{}
+	mut fields := []ast.StructField{}
+	mut nrt := ''
+	mut c_nrt := ''
+	ts := c.table.get_type_symbol(typ)
+	match mut ts.info {
+		ast.Struct, ast.Interface {
+			if !ts.info.is_generic {
+				return typ
+			}
+			nrt = '$ts.name<'
+			c_nrt = '${ts.cname}_T_'
 			for i in 0 .. ts.info.generic_types.len {
 				if ct := c.table.resolve_generic_to_concrete(ts.info.generic_types[i],
 					generic_names, concrete_types)
@@ -658,10 +665,10 @@ fn (mut c Checker) unwrap_generic_struct(struct_type ast.Type, generic_names []s
 			nrt += '>'
 			idx := c.table.type_idxs[nrt]
 			if idx != 0 && c.table.type_symbols[idx].kind != .placeholder {
-				return ast.new_type(idx).derive(struct_type).clear_flag(.generic)
+				return ast.new_type(idx).derive(typ).clear_flag(.generic)
 			} else {
 				// fields type translate to concrete type
-				mut fields := ts.info.fields.clone()
+				fields = ts.info.fields.clone()
 				for i in 0 .. fields.len {
 					if t_typ := c.table.resolve_generic_to_concrete(fields[i].typ, generic_names,
 						concrete_types)
@@ -670,31 +677,76 @@ fn (mut c Checker) unwrap_generic_struct(struct_type ast.Type, generic_names []s
 					}
 				}
 				// update concrete types
-				mut info_concrete_types := []ast.Type{}
 				for i in 0 .. ts.info.generic_types.len {
 					if t_typ := c.table.resolve_generic_to_concrete(ts.info.generic_types[i],
 						generic_names, concrete_types)
 					{
-						info_concrete_types << t_typ
+						final_concrete_types << t_typ
 					}
 				}
-				mut info := ts.info
-				info.is_generic = false
-				info.concrete_types = info_concrete_types
-				info.parent_type = struct_type
-				info.fields = fields
-				stru_idx := c.table.register_type_symbol(ast.TypeSymbol{
-					kind: .struct_
-					name: nrt
-					cname: util.no_dots(c_nrt)
-					mod: c.mod
-					info: info
-				})
-				return ast.new_type(stru_idx).derive(struct_type).clear_flag(.generic)
 			}
-		}
+		} else {}
 	}
-	return struct_type
+	match mut ts.info {
+		ast.Struct {
+			mut info := ts.info
+			info.is_generic = false
+			info.concrete_types = final_concrete_types
+			info.parent_type = typ
+			info.fields = fields
+			new_idx := c.table.register_type_symbol(
+				kind: .struct_
+				name: nrt
+				cname: util.no_dots(c_nrt)
+				mod: c.mod
+				info: info
+			)
+			return ast.new_type(new_idx).derive(typ).clear_flag(.generic)
+		}
+		ast.Interface {
+			// resolve generic types inside methods
+			mut imethods := ts.info.methods.clone()
+			for mut method in imethods {
+				if t := c.table.resolve_generic_to_concrete(method.return_type, generic_names, concrete_types) {
+					method.return_type = t
+				}
+				for mut param in method.params {
+					if t := c.table.resolve_generic_to_concrete(param.typ, generic_names, concrete_types) {
+						param.typ = t
+					}
+				}
+			}
+			mut all_methods := ts.methods
+			for imethod in imethods {
+				for mut method in all_methods {
+					if imethod.name == method.name {
+						method = imethod
+					}
+				}
+			}
+			mut info := ts.info
+			info.is_generic = false
+			info.concrete_types = final_concrete_types
+			info.parent_type = typ
+			info.fields = fields
+			info.methods = imethods
+			new_idx := c.table.register_type_symbol(
+				kind: .interface_
+				name: nrt
+				cname: util.no_dots(c_nrt)
+				mod: c.mod
+				info: info
+			)
+			mut ts_copy := c.table.get_type_symbol(new_idx)
+			for method in all_methods {
+				ts_copy.register_method(method)
+			}
+			println((c.table.get_type_symbol(new_idx).info as ast.Interface).methods.len)
+			return ast.new_type(new_idx).derive(typ).clear_flag(.generic)
+		}
+		else {}
+	}
+	return typ
 }
 
 pub fn (mut c Checker) struct_init(mut node ast.StructInit) ast.Type {
@@ -729,7 +781,7 @@ pub fn (mut c Checker) struct_init(mut node ast.StructInit) ast.Type {
 			return ast.void_type
 		}
 	}
-	unwrapped_struct_type := c.unwrap_generic_struct(node.typ, c.table.cur_fn.generic_names,
+	unwrapped_struct_type := c.unwrap_generic_type(.struct_, node.typ, c.table.cur_fn.generic_names,
 		c.table.cur_concrete_types)
 	c.ensure_type_exists(unwrapped_struct_type, node.pos) or {}
 	type_sym := c.table.get_type_symbol(unwrapped_struct_type)
@@ -2057,7 +2109,7 @@ pub fn (mut c Checker) method_call(mut call_expr ast.CallExpr) ast.Type {
 		}
 		// resolve return generics struct to concrete type
 		if method.generic_names.len > 0 && method.return_type.has_flag(.generic) {
-			call_expr.return_type = c.unwrap_generic_struct(method.return_type, method.generic_names,
+			call_expr.return_type = c.unwrap_generic_type(.struct_, method.return_type, method.generic_names,
 				concrete_types)
 		} else {
 			call_expr.return_type = method.return_type
@@ -2121,6 +2173,12 @@ pub fn (mut c Checker) method_call(mut call_expr ast.CallExpr) ast.Type {
 		c.error(suggestion.say(unknown_method_msg), call_expr.pos)
 	}
 	return ast.void_type
+}
+
+fn (c &Checker) cprintln(s string) {
+	if c.fileis('loool.v') {
+		println(s)
+	}
 }
 
 fn (mut c Checker) map_builtin_method_call(mut call_expr ast.CallExpr, left_type ast.Type, left_type_sym ast.TypeSymbol) ast.Type {
@@ -2633,7 +2691,7 @@ pub fn (mut c Checker) fn_call(mut call_expr ast.CallExpr) ast.Type {
 					concrete_types)
 				{
 					c.check_expected_call_arg(c.unwrap_generic(typ), unwrap_typ, call_expr.language) or {
-						c.error('$err.msg in argument ${i + 1} to `$fn_name`', call_arg.pos)
+						// c.error('$err.msg in argument ${i + 1} to `$fn_name`', call_arg.pos)
 					}
 				}
 			}
@@ -2641,7 +2699,7 @@ pub fn (mut c Checker) fn_call(mut call_expr ast.CallExpr) ast.Type {
 	}
 	// resolve return generics struct to concrete type
 	if func.generic_names.len > 0 && func.return_type.has_flag(.generic) {
-		call_expr.return_type = c.unwrap_generic_struct(func.return_type, func.generic_names,
+		call_expr.return_type = c.unwrap_generic_type(.struct_, func.return_type, func.generic_names,
 			concrete_types)
 	} else {
 		call_expr.return_type = func.return_type
@@ -2703,6 +2761,57 @@ fn semicolonize(main string, details string) string {
 	return '$main; $details'
 }
 
+fn (mut c Checker) resolve_generic_interface(typ ast.Type, interface_type ast.Type, pos token.Position) ast.Type {
+	utyp := c.unwrap_generic(typ)
+	typ_sym := c.table.get_type_symbol(utyp)
+	mut inter_sym := c.table.get_type_symbol(interface_type)
+	if mut inter_sym.info is ast.Interface {
+		if inter_sym.info.is_generic {
+			mut inferred_types := []ast.Type{}
+			for ifield in inter_sym.info.fields {
+				if ifield.typ.has_flag(.generic) {
+					if field := c.table.find_field_with_embeds(typ_sym, ifield.name) {
+						if field.typ !in inferred_types {
+							inferred_types << field.typ
+						}
+					}
+				}
+			}
+			for imethod in inter_sym.info.methods {
+				if method := typ_sym.find_method(imethod.name) {
+					if imethod.return_type.has_flag(.generic) {
+						if method.return_type !in inferred_types {
+							inferred_types << method.return_type
+						}
+					}
+					for i, iparam in imethod.params {
+						param := method.params[i] or { ast.Param{} }
+						if iparam.typ.has_flag(.generic) {
+							if param.typ !in inferred_types {
+								inferred_types << param.typ
+							}
+						}
+					}
+				}
+			}
+			if inferred_types.len == 0 {
+				c.error('cannot infer generic types for ${c.table.type_to_str(interface_type)}', pos)
+			}
+			if inferred_types.len > 1 {
+				c.error('cannot infer generic types for ${c.table.type_to_str(interface_type)}: got conflicting type information', pos)
+			}
+			inferred_type := inferred_types[0]
+			if inferred_type !in inter_sym.info.concrete_types {
+				inter_sym.info.concrete_types << inferred_type
+			}
+			println(inferred_type)
+			generic_names := inter_sym.info.generic_types.map(c.table.get_type_name(it))
+			return c.unwrap_generic_type(.interface_, interface_type, generic_names, inter_sym.info.concrete_types)
+		}
+	}
+	return interface_type
+}
+
 fn (mut c Checker) type_implements(typ ast.Type, interface_type ast.Type, pos token.Position) bool {
 	$if debug_interface_type_implements ? {
 		eprintln('> type_implements typ: $typ.debug() | inter_typ: $interface_type.debug()')
@@ -2710,7 +2819,12 @@ fn (mut c Checker) type_implements(typ ast.Type, interface_type ast.Type, pos to
 	utyp := c.unwrap_generic(typ)
 	typ_sym := c.table.get_type_symbol(utyp)
 	mut inter_sym := c.table.get_type_symbol(interface_type)
-	// do not check the same type more than once
+	if mut inter_sym.info is ast.Interface {
+		if inter_sym.info.is_generic {
+			inferred_type := c.resolve_generic_interface(typ, interface_type, pos)
+			return c.type_implements(typ, inferred_type, pos)
+		}
+	}	// do not check the same type more than once
 	if mut inter_sym.info is ast.Interface {
 		for t in inter_sym.info.types {
 			if t.idx() == utyp.idx() {

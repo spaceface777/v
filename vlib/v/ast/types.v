@@ -749,6 +749,11 @@ pub mut:
 	fields  []StructField
 	methods []Fn
 	ifaces  []Type
+	// generic interface support
+	is_generic     bool
+	generic_types  []Type
+	concrete_types []Type
+	parent_type    Type
 }
 
 pub struct Enum {

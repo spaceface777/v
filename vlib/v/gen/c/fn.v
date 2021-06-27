@@ -146,7 +146,7 @@ fn (mut g Gen) gen_fn_decl(node &ast.FnDecl, skip bool) {
 		for concrete_types in g.table.fn_generic_types[node.name] {
 			if g.pref.is_verbose {
 				syms := concrete_types.map(g.table.get_type_symbol(it))
-				the_type := syms.map(node.name).join(', ')
+				the_type := syms.map(it.name).join(', ')
 				println('gen fn `$node.name` for type `$the_type`')
 			}
 			g.table.cur_concrete_types = concrete_types
@@ -538,6 +538,12 @@ fn (mut g Gen) method_call(node ast.CallExpr) {
 	typ_sym := g.table.get_type_symbol(unwrapped_rec_type)
 	rec_cc_type := g.cc_type(unwrapped_rec_type, false)
 	mut receiver_type_name := util.no_dots(rec_cc_type)
+
+	// MUST be removed before merging:
+	if receiver_type_name == 'main__Iterator<>' {
+		receiver_type_name = 'main__Iterator_T_int'
+	}
+
 	if typ_sym.kind == .interface_ && (typ_sym.info as ast.Interface).defines_method(node.name) {
 		// Speaker_name_table[s._interface_idx].speak(s._object)
 		$if debug_interface_method_call ? {

@@ -539,6 +539,9 @@ pub fn (mut g Gen) write_typeof_functions() {
 			g.writeln('}')
 		} else if typ.kind == .interface_ {
 			inter_info := typ.info as ast.Interface
+			if inter_info.is_generic {
+				continue
+			}
 			g.writeln('static char * v_typeof_interface_${typ.cname}(int sidx) { /* $typ.name */ ')
 			for t in inter_info.types {
 				subtype := g.table.get_type_symbol(t)
@@ -719,15 +722,27 @@ static inline Option_void __Option_${styp}_pushval($styp ch, $el_type e) {
 fn (mut g Gen) cc_type(typ ast.Type, is_prefix_struct bool) string {
 	sym := g.table.get_type_symbol(g.unwrap_generic(typ))
 	mut styp := sym.cname
+	// println('$styp - $sym.info.type_name()')
 	// TODO: this needs to be removed; cgen shouldn't resolve generic types (job of checker)
 	if mut sym.info is ast.Struct {
 		if sym.info.is_generic {
-			mut sgtyps := '_T'
+			println(styp)
+				mut sgtyps := '_T'
 			for gt in sym.info.generic_types {
 				gts := g.table.get_type_symbol(g.unwrap_generic(gt))
 				sgtyps += '_$gts.cname'
 			}
 			styp += sgtyps
+		}
+	} else if mut sym.info is ast.Interface {
+		if sym.info.is_generic {
+			println(styp)
+			mut sgtyps := '_T'
+			for gt in sym.info.generic_types {
+				gts := g.table.get_type_symbol(g.unwrap_generic(gt))
+				sgtyps += '_$gts.cname'
+			}
+			styp += sgtyps + '/* hi */'
 		}
 	} else if mut sym.info is ast.MultiReturn {
 		// TODO: this doesn't belong here, but makes it working for now
@@ -866,6 +881,9 @@ pub fn (mut g Gen) write_alias_typesymbol_declaration(sym ast.TypeSymbol) {
 
 pub fn (mut g Gen) write_interface_typesymbol_declaration(sym ast.TypeSymbol) {
 	info := sym.info as ast.Interface
+	if info.is_generic {
+		return
+	}
 	g.type_definitions.writeln('typedef struct {')
 	g.type_definitions.writeln('\tunion {')
 	g.type_definitions.writeln('\t\tvoid* _object;')
@@ -880,7 +898,7 @@ pub fn (mut g Gen) write_interface_typesymbol_declaration(sym ast.TypeSymbol) {
 		cname := c_name(field.name)
 		g.type_definitions.writeln('\t$styp* $cname;')
 	}
-	g.type_definitions.writeln('} ${c_name(sym.name)};')
+	g.type_definitions.writeln('} $sym.cname;')
 }
 
 pub fn (mut g Gen) write_fn_typesymbol_declaration(sym ast.TypeSymbol) {
@@ -1826,7 +1844,11 @@ fn (mut g Gen) expr_with_cast(expr ast.Expr, got_type_raw ast.Type, expected_typ
 		&& !expected_type.has_flag(.optional) {
 		got_styp := g.cc_type(got_type, true)
 		exp_styp := g.cc_type(expected_type, true)
-		fname := 'I_${got_styp}_to_Interface_$exp_styp'
+		mut fname := 'I_${got_styp}_to_Interface_$exp_styp'
+		g.write('/* ${(exp_sym.info as ast.Interface).is_generic} */')
+		if (exp_sym.info as ast.Interface).is_generic {
+			fname = 'I_${got_styp}_to_Interface_${exp_sym.cname}_T_int'
+		}
 		g.call_cfn_for_casting_expr(fname, expr, expected_is_ptr, exp_styp, got_is_ptr,
 			got_styp)
 		return
@@ -4878,6 +4900,11 @@ fn (mut g Gen) global_decl(node ast.GlobalDecl) {
 	}
 }
 
+// useful for debugging
+fn (mut g Gen) comment(s string) {
+	g.write('/* $s */')
+}
+
 fn (mut g Gen) go_back_out(n int) {
 	g.out.go_back(n)
 }
@@ -6024,6 +6051,9 @@ fn (mut g Gen) interface_table() string {
 			continue
 		}
 		inter_info := ityp.info as ast.Interface
+		if inter_info.is_generic {
+			continue
+		}
 		// interface_name is for example Speaker
 		interface_name := ityp.cname
 		// generate a struct that references interface methods
