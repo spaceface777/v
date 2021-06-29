@@ -701,6 +701,20 @@ fn (mut c Checker) unwrap_generic_type(kind ast.Kind, typ ast.Type, generic_name
 				mod: c.mod
 				info: info
 			)
+			mut ts_copy := c.table.get_type_symbol(new_idx)
+			mut x := ts.methods.clone()
+			for mut method in x {
+				if t := c.table.resolve_generic_to_concrete(method.return_type, generic_names, concrete_types) {
+					method.return_type = t
+				}
+				for mut param in method.params {
+					if t := c.table.resolve_generic_to_concrete(param.typ, generic_names, concrete_types) {
+						param.typ = t
+					}
+				}
+				ts_copy.register_method(method)
+			}
+
 			return ast.new_type(new_idx).derive(typ).clear_flag(.generic)
 		}
 		ast.Interface {
@@ -741,7 +755,6 @@ fn (mut c Checker) unwrap_generic_type(kind ast.Kind, typ ast.Type, generic_name
 			for method in all_methods {
 				ts_copy.register_method(method)
 			}
-			println((c.table.get_type_symbol(new_idx).info as ast.Interface).methods.len)
 			return ast.new_type(new_idx).derive(typ).clear_flag(.generic)
 		}
 		else {}
@@ -2762,6 +2775,9 @@ fn semicolonize(main string, details string) string {
 }
 
 fn (mut c Checker) resolve_generic_interface(typ ast.Type, interface_type ast.Type, pos token.Position) ast.Type {
+	// defer {
+	// }
+	println(' YES')
 	utyp := c.unwrap_generic(typ)
 	typ_sym := c.table.get_type_symbol(utyp)
 	mut inter_sym := c.table.get_type_symbol(interface_type)
@@ -2796,15 +2812,16 @@ fn (mut c Checker) resolve_generic_interface(typ ast.Type, interface_type ast.Ty
 			}
 			if inferred_types.len == 0 {
 				c.error('cannot infer generic types for ${c.table.type_to_str(interface_type)}', pos)
+				return ast.void_type
 			}
 			if inferred_types.len > 1 {
 				c.error('cannot infer generic types for ${c.table.type_to_str(interface_type)}: got conflicting type information', pos)
+				return ast.void_type
 			}
 			inferred_type := inferred_types[0]
 			if inferred_type !in inter_sym.info.concrete_types {
 				inter_sym.info.concrete_types << inferred_type
 			}
-			println(inferred_type)
 			generic_names := inter_sym.info.generic_types.map(c.table.get_type_name(it))
 			return c.unwrap_generic_type(.interface_, interface_type, generic_names, inter_sym.info.concrete_types)
 		}
@@ -2816,12 +2833,17 @@ fn (mut c Checker) type_implements(typ ast.Type, interface_type ast.Type, pos to
 	$if debug_interface_type_implements ? {
 		eprintln('> type_implements typ: $typ.debug() | inter_typ: $interface_type.debug()')
 	}
+	println(c.table.type_symbols)
 	utyp := c.unwrap_generic(typ)
 	typ_sym := c.table.get_type_symbol(utyp)
 	mut inter_sym := c.table.get_type_symbol(interface_type)
 	if mut inter_sym.info is ast.Interface {
 		if inter_sym.info.is_generic {
 			inferred_type := c.resolve_generic_interface(typ, interface_type, pos)
+			c.warn('inferred: ${c.table.type_to_str(inferred_type)}', pos)
+			if inferred_type == 0 {
+				return false
+			}
 			return c.type_implements(typ, inferred_type, pos)
 		}
 	}	// do not check the same type more than once
@@ -2859,6 +2881,8 @@ fn (mut c Checker) type_implements(typ ast.Type, interface_type ast.Type, pos to
 				c.add_error_detail('$inter_sym.name has `$sig`')
 				c.error('`$styp` incorrectly implements method `$imethod.name` of interface `$inter_sym.name`: $msg',
 					pos)
+				// dump(imethod)
+				// dump(method)
 				return false
 			}
 			continue

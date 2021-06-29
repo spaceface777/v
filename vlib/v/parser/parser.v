@@ -1858,17 +1858,31 @@ fn (p &Parser) is_generic_call() bool {
 	if p.peek_tok.kind != .lt {
 		return false
 	}
-	// lit0_is_capital := if p.tok.kind != .eof && p.tok.lit.len > 0 {
-	// 	p.tok.lit[0].is_capital()
-	// } else {
-	// 	false
-	// }
-	// if lit0_is_capital() &&
 	tok2 := p.peek_token(2)
 	tok3 := p.peek_token(3)
 	tok4 := p.peek_token(4)
 	tok5 := p.peek_token(5)
 	kind2, kind3, kind4, kind5 := tok2.kind, tok3.kind, tok4.kind, tok5.kind
+
+	lit0_is_capital := p.tok.kind != .eof && p.tok.lit.len > 0 && p.tok.lit[0].is_capital()
+	if lit0_is_capital {
+		mut i := 2
+		for {
+			i++
+			tok := p.peek_token(i)
+			if tok.kind == .gt || i > 20 {
+				break
+			}
+		}
+		next_tok := p.peek_token(i + 1)
+		// `Foo<string>(`, `Foo<mod.Type>(`, etc. are valid type casts - allow them
+		if next_tok.kind == .lpar {
+			return true
+		}
+		// `Foo<string>{`, `Foo<mod.Type>{` (note the curly bracket rather than the paren)
+		// are not casts, but struct initializations instead
+		return false
+	}
 
 	if kind2 == .lsbr {
 		// case 1

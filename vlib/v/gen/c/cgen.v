@@ -724,34 +724,25 @@ fn (mut g Gen) cc_type(typ ast.Type, is_prefix_struct bool) string {
 	mut styp := sym.cname
 	// println('$styp - $sym.info.type_name()')
 	// TODO: this needs to be removed; cgen shouldn't resolve generic types (job of checker)
-	if mut sym.info is ast.Struct {
-		if sym.info.is_generic {
-			println(styp)
+	match mut sym.info {
+		ast.Struct, ast.Interface {
+			if sym.info.is_generic {
 				mut sgtyps := '_T'
-			for gt in sym.info.generic_types {
-				gts := g.table.get_type_symbol(g.unwrap_generic(gt))
-				sgtyps += '_$gts.cname'
+				for gt in sym.info.generic_types {
+					gts := g.table.get_type_symbol(g.unwrap_generic(gt))
+					sgtyps += '_$gts.cname'
+				}
+				styp += sgtyps
 			}
-			styp += sgtyps
-		}
-	} else if mut sym.info is ast.Interface {
-		if sym.info.is_generic {
-			println(styp)
-			mut sgtyps := '_T'
-			for gt in sym.info.generic_types {
-				gts := g.table.get_type_symbol(g.unwrap_generic(gt))
-				sgtyps += '_$gts.cname'
+		} ast.MultiReturn {
+			// TODO: this doesn't belong here, but makes it working for now
+			mut cname := 'multi_return'
+			for mr_typ in sym.info.types {
+				mr_type_sym := g.table.get_type_symbol(g.unwrap_generic(mr_typ))
+				cname += '_$mr_type_sym.cname'
 			}
-			styp += sgtyps + '/* hi */'
-		}
-	} else if mut sym.info is ast.MultiReturn {
-		// TODO: this doesn't belong here, but makes it working for now
-		mut cname := 'multi_return'
-		for mr_typ in sym.info.types {
-			mr_type_sym := g.table.get_type_symbol(g.unwrap_generic(mr_typ))
-			cname += '_$mr_type_sym.cname'
-		}
-		return cname
+			return cname
+		} else {}
 	}
 	if is_prefix_struct && styp.starts_with('C__') {
 		styp = styp[3..]

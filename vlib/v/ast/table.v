@@ -1162,6 +1162,7 @@ fn (mut table Table) does_type_implement_interface(typ Type, inter_typ Type) boo
 // This is used for resolving the generic return type of CallExpr white `unwrap_generic` is used to resolve generic usage in FnDecl.
 pub fn (mut t Table) resolve_generic_to_concrete(generic_type Type, generic_names []string, concrete_types []Type) ?Type {
 	mut sym := t.get_type_symbol(generic_type)
+	println('  $sym.name is $sym.info.type_name()')
 	if sym.name in generic_names {
 		index := generic_names.index(sym.name)
 		if index >= concrete_types.len {
@@ -1262,6 +1263,7 @@ pub fn (mut t Table) resolve_generic_to_concrete(generic_type Type, generic_name
 			}
 		}
 		Struct, Interface {
+			println('\tgeneric: $sym.info.is_generic')
 			if sym.info.is_generic {
 				mut nrt := '$sym.name<'
 				for i in 0 .. sym.info.generic_types.len {
@@ -1294,32 +1296,132 @@ pub fn (mut t Table) generic_struct_insts_to_concrete() {
 		if typ.kind == .generic_struct_inst {
 			info := typ.info as GenericStructInst
 			parent := t.type_symbols[info.parent_idx]
+			mut parent_info := parent.info
+			mut unsmartcasted_parent_info := parent_info
 			if parent.kind == .placeholder {
 				typ.kind = .placeholder
 				continue
 			}
-			mut parent_info := parent.info as Struct
-			mut fields := parent_info.fields.clone()
-			if parent_info.generic_types.len == info.concrete_types.len {
-				generic_names := parent_info.generic_types.map(t.get_type_symbol(it).name)
-				for i in 0 .. fields.len {
-					if t_typ := t.resolve_generic_to_concrete(fields[i].typ, generic_names,
-						info.concrete_types)
-					{
-						fields[i].typ = t_typ
+			match mut parent_info {
+				Struct {
+					mut fields := parent_info.fields.clone()
+					if parent_info.generic_types.len == info.concrete_types.len {
+						generic_names := parent_info.generic_types.map(t.get_type_symbol(it).name)
+						for i in 0 .. fields.len {
+							if t_typ := t.resolve_generic_to_concrete(fields[i].typ, generic_names,
+								info.concrete_types)
+							{
+								fields[i].typ = t_typ
+							}
+						}
+						parent_info.is_generic = false
+						parent_info.concrete_types = info.concrete_types.clone()
+						parent_info.fields = fields
+						parent_info.parent_type = new_type(info.parent_idx).set_flag(.generic)
+						typ.is_public = true
+						typ.kind = parent.kind
+						typ.info = parent_info
 					}
-				}
-				parent_info.is_generic = false
-				parent_info.concrete_types = info.concrete_types.clone()
-				parent_info.fields = fields
-				parent_info.parent_type = new_type(info.parent_idx).set_flag(.generic)
-				typ.is_public = true
-				typ.kind = .struct_
-				typ.info = parent_info
+				} Interface {
+					mut fields := parent_info.fields.clone()
+					if parent_info.generic_types.len == info.concrete_types.len {
+						generic_names := parent_info.generic_types.map(t.get_type_symbol(it).name)
+						for i in 0 .. fields.len {
+							if t_typ := t.resolve_generic_to_concrete(fields[i].typ, generic_names,
+								info.concrete_types)
+							{
+								fields[i].typ = t_typ
+							}
+						}
+						parent_info.is_generic = false
+						parent_info.concrete_types = info.concrete_types.clone()
+						parent_info.fields = fields
+						parent_info.parent_type = new_type(info.parent_idx).set_flag(.generic)
+						typ.is_public = true
+						typ.kind = parent.kind
+						typ.info = parent_info
+					}
+
+				} else {}
 			}
 		}
 	}
 }
+
+// // generic struct instantiations to concrete types
+// pub fn (mut t Table) generic_struct_insts_to_concrete() {
+// 	for mut typ in t.type_symbols {
+// 		if typ.kind == .generic_struct_inst {
+// 			info := typ.info as GenericStructInst
+// 			mut parent := t.type_symbols[info.parent_idx]
+// 			println('$typ.name -> $parent.name')
+// 			// works around a V bug with aggregates
+// 			unsmartcasted_parent := parent
+// 			if parent.kind == .placeholder {
+// 				typ.kind = .placeholder
+// 				continue
+// 			}
+// 			match mut parent.info {
+// 				Struct, Interface {
+// 					mut fields := parent.info.fields.clone()
+// 					if parent.info.generic_types.len == info.concrete_types.len {
+// 						generic_names := parent.info.generic_types.map(t.get_type_symbol(it).name)
+
+// 						mut nrt := '$parent.name<'
+// 						for i in 0 .. parent.info.generic_types.len {
+// 							if ct := t.resolve_generic_to_concrete(parent.info.generic_types[i],
+// 								generic_names, info.concrete_types)
+// 							{
+// 								gts := t.get_type_symbol(ct)
+// 								nrt += gts.name
+// 								if i != parent.info.generic_types.len - 1 {
+// 									nrt += ','
+// 								}
+// 							}
+// 						}
+// 						nrt += '>'
+
+// 						for i in 0 .. fields.len {
+// 							if t_typ := t.resolve_generic_to_concrete(fields[i].typ, generic_names,
+// 								info.concrete_types)
+// 							{
+// 								println('  ${fields[i].name}: ${fields[i].typ} = $t_typ')
+// 								fields[i].typ = t_typ
+// 							}
+// 						}
+// 						parent.info.is_generic = false
+// 						parent.info.concrete_types = info.concrete_types.clone()
+// 						parent.info.fields = fields
+// 						parent.info.parent_type = new_type(info.parent_idx).set_flag(.generic)
+// 						typ.is_public = true
+// 						typ.name = nrt
+// 						typ.kind = parent.kind
+// 						typ.info = unsmartcasted_parent.info
+// 						mut methods := parent.methods.clone()
+// 						for mut method in methods {
+// 							if rt := t.resolve_generic_to_concrete(method.return_type, generic_names, info.concrete_types) {
+// 								ft := ast.new_type(rt).derive(info.parent_idx).clear_flag(.generic)
+// 								println('  ${method.name}: return type: ${method.return_type} = $ft')
+// 								method.return_type = ft
+// 							}
+// 							for mut param in method.params {
+// 								println('\n== resolving param $param.name')
+// 								if pt := t.resolve_generic_to_concrete(param.typ, generic_names, info.concrete_types) {
+// 									println('==> DONE!')
+// 									ft := ast.new_type(pt).derive(info.parent_idx).clear_flag(.generic)
+// 									println('  ${method.name}: param: ${param.typ} = $ft')
+// 									param.typ = ft
+// 								}
+// 								println('done with param\n\n\n\n')
+// 							}
+// 							typ.register_method(method)
+// 						}
+// 					}
+// 				} else {}
+// 			}
+// 		}
+// 	}
+// }
 
 pub fn (mut table Table) type_implements_interface(utyp Type, interface_type Type) bool {
 	$if debug_interface_type_implements ? {
