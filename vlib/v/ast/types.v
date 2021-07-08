@@ -835,11 +835,15 @@ pub mut:
 }
 
 pub struct SumType {
-pub:
-	variants []Type
 pub mut:
+	variants     []Type
 	fields       []StructField
 	found_fields bool
+	// generic interface support
+	is_generic     bool
+	generic_types  []Type
+	concrete_types []Type
+	parent_type    Type
 }
 
 // human readable type name

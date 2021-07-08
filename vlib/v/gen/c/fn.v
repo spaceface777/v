@@ -142,13 +142,15 @@ fn (mut g Gen) gen_fn_decl(node &ast.FnDecl, skip bool) {
 	// println('\ngen_fn_decl() $node.name $node.is_generic $g.cur_generic_type')
 	// }
 	if node.generic_names.len > 0 && g.table.cur_concrete_types.len == 0 { // need the cur_concrete_type check to avoid inf. recursion
+		println('>> hi: $node.name >>')
+		// current: check g.table.fn_generic_types
 		// loop thru each generic type and generate a function
 		for concrete_types in g.table.fn_generic_types[node.name] {
-			if g.pref.is_verbose {
+			// if g.pref.is_verbose {
 				syms := concrete_types.map(g.table.get_type_symbol(it))
 				the_type := syms.map(it.name).join(', ')
 				println('gen fn `$node.name` for type `$the_type`')
-			}
+			// }
 			g.table.cur_concrete_types = concrete_types
 			g.gen_fn_decl(node, skip)
 		}

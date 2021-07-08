@@ -1866,21 +1866,6 @@ fn (p &Parser) is_generic_call() bool {
 
 	lit0_is_capital := p.tok.kind != .eof && p.tok.lit.len > 0 && p.tok.lit[0].is_capital()
 	if lit0_is_capital {
-		mut i := 2
-		for {
-			i++
-			tok := p.peek_token(i)
-			if tok.kind == .gt || i > 20 {
-				break
-			}
-		}
-		next_tok := p.peek_token(i + 1)
-		// `Foo<string>(`, `Foo<mod.Type>(`, etc. are valid type casts - allow them
-		if next_tok.kind == .lpar {
-			return true
-		}
-		// `Foo<string>{`, `Foo<mod.Type>{` (note the curly bracket rather than the paren)
-		// are not casts, but struct initializations instead
 		return false
 	}
 
@@ -1903,6 +1888,31 @@ fn (p &Parser) is_generic_call() bool {
 		}
 	}
 	return false
+}
+
+fn (mut p Parser) is_generic_cast() bool {
+	if !p.tok.can_start_type(ast.builtin_type_names) {
+		return false
+	}
+	mut i := 2
+	for {
+		i++
+		tok := p.peek_token(i)
+		if tok.kind == .gt {
+			break
+		}
+		if i > 20 || tok.kind !in [.lsbr, .rsbr, .name, .dot, .key_fn] {
+			return false
+		}
+	}
+	next_tok := p.peek_token(i + 1)
+	// `Foo<string>(`, `Foo<mod.Type>(`, etc. are valid type casts - allow them
+	if next_tok.kind == .lpar {
+		return true
+	}
+	return false
+	// `Foo<string>{`, `Foo<mod.Type>{` (note the curly bracket rather than the paren)
+	// are not casts, but struct initializations instead
 }
 
 pub fn (mut p Parser) name_expr() ast.Expr {
@@ -2045,6 +2055,10 @@ pub fn (mut p Parser) name_expr() ast.Expr {
 		false
 	}
 	is_optional := p.tok.kind == .question
+	is_generic_call := p.is_generic_call()
+	is_generic_cast := p.is_generic_cast()
+
+	// p.warn(is_generic_cast.str())
 	// p.warn('name expr  $p.tok.lit $p.peek_tok.str()')
 	same_line := p.tok.line_nr == p.peek_tok.line_nr
 	// `(` must be on same line as name token otherwise it's a ParExpr
@@ -2057,8 +2071,8 @@ pub fn (mut p Parser) name_expr() ast.Expr {
 				p.defer_vars << ident
 			}
 		}
-	} else if p.peek_tok.kind == .lpar
-		|| (is_optional && p.peek_token(2).kind == .lpar) || p.is_generic_call() {
+	} else if p.peek_tok.kind == .lpar || is_generic_call || is_generic_cast
+		|| (is_optional && p.peek_token(2).kind == .lpar) {
 		// foo(), foo<int>() or type() cast
 		mut name := if is_optional { p.peek_tok.lit } else { p.tok.lit }
 		if mod.len > 0 {
@@ -2068,8 +2082,9 @@ pub fn (mut p Parser) name_expr() ast.Expr {
 		// type cast. TODO: finish
 		// if name in ast.builtin_type_names {
 		if (!known_var && (name in p.table.type_idxs || name_w_mod in p.table.type_idxs)
-			&& name !in ['C.stat', 'C.sigaction']) || is_mod_cast
+			&& name !in ['C.stat', 'C.sigaction']) || is_mod_cast || is_generic_cast
 			|| (language == .v && name[0].is_capital()) {
+
 			// MainLetter(x) is *always* a cast, as long as it is not `C.`
 			// TODO handle C.stat()
 			start_pos := p.tok.position()
@@ -3075,6 +3090,18 @@ fn (mut p Parser) type_decl() ast.TypeDecl {
 		return ast.FnTypeDecl{}
 	}
 	mut sum_variants := []ast.TypeNode{}
+	mut generic_types := []ast.Type{}
+	if p.tok.kind == .lt {
+		p.next()
+		for {
+			generic_types << p.parse_type()
+			if p.tok.kind != .comma {
+				break
+			}
+			p.next()
+		}
+		p.check(.gt)
+	}
 	p.check(.assign)
 	mut type_pos := p.tok.position()
 	mut comments := []ast.Comment{}
@@ -3130,6 +3157,8 @@ fn (mut p Parser) type_decl() ast.TypeDecl {
 			mod: p.mod
 			info: ast.SumType{
 				variants: variant_types
+				is_generic: generic_types.len > 0
+				generic_types: generic_types
 			}
 			is_public: is_pub
 		})

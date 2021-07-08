@@ -1,0 +1,707 @@
+{
+	"ast_type":	"ast.File",
+	"path":	"C:\\Users\\spaceface\\Documents\\git\\v\\vvv\\.\\iter.v",
+	"path_base":	"iter.v",
+	"nr_lines":	15,
+	"nr_bytes":	198,
+	"mod":	{
+		"ast_type":	"Module",
+		"name":	"main",
+		"short_name":	"main",
+		"attrs":	[],
+		"pos":	{
+			"line_nr":	0,
+			"pos":	0,
+			"len":	0
+		},
+		"name_pos":	{
+			"line_nr":	0,
+			"pos":	0,
+			"len":	0
+		},
+		"is_skipped":	true
+	},
+	"imports":	[],
+	"global_scope":	{
+		"ast_type":	"Scope",
+		"parent":	"0",
+		"children":	[],
+		"start_pos":	0,
+		"end_pos":	0,
+		"objects":	{
+		},
+		"struct_fields":	[]
+	},
+	"scope":	{
+		"ast_type":	"Scope",
+		"parent":	"c2a690",
+		"children":	[{
+				"parent":	"c2a560",
+				"start_pos":	50,
+				"end_pos":	143
+			}, {
+				"parent":	"c2a560",
+				"start_pos":	149,
+				"end_pos":	196
+			}],
+		"start_pos":	0,
+		"end_pos":	198,
+		"objects":	{
+		},
+		"struct_fields":	[]
+	},
+	"errors":	[],
+	"warnings":	[],
+	"notices":	[],
+	"auto_imports":	[],
+	"imported_symbols":	{
+	},
+	"generic_fns":	[],
+	"embedded_files":	[],
+	"global_labels":	[],
+	"is_test":	false,
+	"stmts":	[{
+			"ast_type":	"Module",
+			"name":	"main",
+			"short_name":	"main",
+			"attrs":	[],
+			"pos":	{
+				"line_nr":	0,
+				"pos":	0,
+				"len":	0
+			},
+			"name_pos":	{
+				"line_nr":	0,
+				"pos":	0,
+				"len":	0
+			},
+			"is_skipped":	true
+		}, {
+			"ast_type":	"StructDecl",
+			"name":	"main.None",
+			"is_pub":	false,
+			"pub_pos":	-1,
+			"mut_pos":	-1,
+			"pub_mut_pos":	-1,
+			"global_pos":	-1,
+			"module_pos":	-1,
+			"language":	"enum:0(v)",
+			"is_union":	false,
+			"pos":	{
+				"line_nr":	0,
+				"pos":	0,
+				"len":	11
+			},
+			"fields":	[],
+			"generic_types":	[],
+			"attrs":	[],
+			"end_comments":	[],
+			"embeds":	[]
+		}, {
+			"ast_type":	"SumTypeDecl",
+			"name":	"WeirdOption",
+			"is_pub":	false,
+			"pos":	{
+				"line_nr":	1,
+				"pos":	15,
+				"len":	16
+			},
+			"typ":	"main.WeirdOption",
+			"comments":	[],
+			"variants":	[{
+					"typ":	"T",
+					"pos":	{
+						"line_nr":	1,
+						"pos":	37,
+						"len":	1
+					}
+				}, {
+					"typ":	"main.None",
+					"pos":	{
+						"line_nr":	1,
+						"pos":	41,
+						"len":	4
+					}
+				}]
+		}, {
+			"ast_type":	"FnDecl",
+			"name":	"main.unwrap",
+			"mod":	"main",
+			"is_deprecated":	false,
+			"is_pub":	false,
+			"is_variadic":	false,
+			"is_anon":	false,
+			"is_manualfree":	false,
+			"is_main":	false,
+			"is_test":	false,
+			"is_conditional":	false,
+			"is_exported":	false,
+			"is_keep_alive":	false,
+			"receiver":	{
+				"ast_type":	"StructField",
+				"name":	"",
+				"typ":	"void",
+				"type_pos":	{
+					"line_nr":	0,
+					"pos":	0,
+					"len":	0
+				},
+				"has_default_expr":	false,
+				"default_expr_typ":	null,
+				"default_expr":	null,
+				"is_pub":	false,
+				"is_mut":	false,
+				"is_global":	false,
+				"attrs":	[],
+				"comments":	[],
+				"pos":	{
+					"line_nr":	0,
+					"pos":	0,
+					"len":	0
+				}
+			},
+			"receiver_pos":	{
+				"line_nr":	0,
+				"pos":	0,
+				"len":	0
+			},
+			"is_method":	false,
+			"method_idx":	0,
+			"rec_mut":	false,
+			"rec_share":	"enum:0(mut)",
+			"language":	"enum:0(v)",
+			"no_body":	false,
+			"is_builtin":	false,
+			"is_direct_arr":	false,
+			"ctdefine_idx":	-1,
+			"pos":	{
+				"line_nr":	3,
+				"pos":	47,
+				"len":	32
+			},
+			"body_pos":	{
+				"line_nr":	4,
+				"pos":	83,
+				"len":	2
+			},
+			"return_type_pos":	{
+				"line_nr":	3,
+				"pos":	78,
+				"len":	1
+			},
+			"file":	"C:\\Users\\spaceface\\Documents\\git\\v\\vvv\\.\\iter.v",
+			"has_return":	false,
+			"return_type":	"T",
+			"source_file":	0,
+			"scope":	12758448,
+			"attrs":	[],
+			"params":	[{
+					"ast_type":	"Param",
+					"name":	"o",
+					"typ":	"main.WeirdOption",
+					"is_mut":	false
+				}],
+			"generic_names":	["T"],
+			"stmts":	[{
+					"ast_type":	"ExprStmt",
+					"typ":	null,
+					"is_expr":	false,
+					"expr":	{
+						"ast_type":	"IfExpr",
+						"is_comptime":	false,
+						"tok_kind":	"token:0(unknown)",
+						"branches":	[{
+								"ast_type":	"IfBranch",
+								"cond":	{
+									"ast_type":	"InfixExpr",
+									"op":	"token:84(is)",
+									"left":	{
+										"ast_type":	"Ident",
+										"mod":	"main",
+										"name":	"o",
+										"language":	"enum:0(v)",
+										"is_mut":	false,
+										"comptime":	true,
+										"tok_kind":	"token:84(is)",
+										"kind":	"enum:0(unresolved)",
+										"info":	{
+											"ast_type":	"IdentVar",
+											"typ":	null,
+											"is_mut":	false,
+											"is_static":	false,
+											"is_optional":	false,
+											"share":	"enum:0(mut)"
+										},
+										"pos":	{
+											"line_nr":	4,
+											"pos":	86,
+											"len":	1
+										},
+										"mut_pos":	{
+											"line_nr":	4,
+											"pos":	86,
+											"len":	1
+										},
+										"obj":	{
+										},
+										"scope":	12758448
+									},
+									"left_type":	null,
+									"right":	{
+										"ast_type":	"TypeNode",
+										"typ":	"T",
+										"pos":	{
+											"line_nr":	4,
+											"pos":	91,
+											"len":	1
+										}
+									},
+									"right_type":	null,
+									"auto_locked":	"",
+									"or_block":	{
+										"ast_type":	"OrExpr",
+										"stmts":	[],
+										"kind":	"enum:0(absent)",
+										"pos":	{
+											"line_nr":	4,
+											"pos":	93,
+											"len":	1
+										}
+									},
+									"is_stmt":	false,
+									"pos":	{
+										"line_nr":	4,
+										"pos":	88,
+										"len":	2
+									}
+								},
+								"pos":	{
+									"line_nr":	4,
+									"pos":	83,
+									"len":	9
+								},
+								"body_pos":	{
+									"line_nr":	4,
+									"pos":	93,
+									"len":	15
+								},
+								"scope":	12759056,
+								"stmts":	[{
+										"ast_type":	"Return",
+										"exprs":	[{
+												"ast_type":	"Ident",
+												"mod":	"main",
+												"name":	"o",
+												"language":	"enum:0(v)",
+												"is_mut":	false,
+												"comptime":	false,
+												"tok_kind":	"token:47(})",
+												"kind":	"enum:0(unresolved)",
+												"info":	{
+													"ast_type":	"IdentVar",
+													"typ":	null,
+													"is_mut":	false,
+													"is_static":	false,
+													"is_optional":	false,
+													"share":	"enum:0(mut)"
+												},
+												"pos":	{
+													"line_nr":	5,
+													"pos":	104,
+													"len":	1
+												},
+												"mut_pos":	{
+													"line_nr":	5,
+													"pos":	104,
+													"len":	1
+												},
+												"obj":	{
+												},
+												"scope":	12759056
+											}],
+										"types":	[],
+										"pos":	{
+											"line_nr":	5,
+											"pos":	97,
+											"len":	8
+										}
+									}],
+								"comments":	[]
+							}],
+						"left":	null,
+						"typ":	null,
+						"has_else":	false,
+						"is_expr":	false,
+						"pos":	{
+							"line_nr":	4,
+							"pos":	83,
+							"len":	2
+						},
+						"post_comments":	[]
+					},
+					"pos":	{
+						"line_nr":	4,
+						"pos":	83,
+						"len":	2
+					},
+					"comments":	[]
+				}, {
+					"ast_type":	"ExprStmt",
+					"typ":	null,
+					"is_expr":	false,
+					"expr":	{
+						"ast_type":	"CallExpr",
+						"left":	null,
+						"is_method":	false,
+						"mod":	"main",
+						"name":	"eprintln",
+						"language":	"enum:0(v)",
+						"scope":	12758448,
+						"args":	[{
+								"ast_type":	"CallArg",
+								"typ":	null,
+								"is_mut":	false,
+								"share":	"enum:0(mut)",
+								"expr":	{
+									"ast_type":	"StringLiteral",
+									"val":	"got None",
+									"is_raw":	false,
+									"language":	"enum:0(v)",
+									"pos":	{
+										"line_nr":	7,
+										"pos":	119,
+										"len":	10
+									}
+								},
+								"is_tmp_autofree":	false,
+								"pos":	{
+									"line_nr":	7,
+									"pos":	119,
+									"len":	10
+								},
+								"comments":	[]
+							}],
+						"expected_arg_types":	[],
+						"concrete_types":	[],
+						"or_block":	{
+							"ast_type":	"OrExpr",
+							"stmts":	[],
+							"kind":	"enum:0(absent)",
+							"pos":	{
+								"line_nr":	8,
+								"pos":	132,
+								"len":	6
+							}
+						},
+						"left_type":	null,
+						"receiver_type":	null,
+						"return_type":	null,
+						"should_be_skipped":	false,
+						"concrete_list_pos":	{
+							"line_nr":	7,
+							"pos":	118,
+							"len":	1
+						},
+						"free_receiver":	false,
+						"from_embed_type":	null,
+						"comments":	[],
+						"pos":	{
+							"line_nr":	7,
+							"pos":	110,
+							"len":	20
+						},
+						"name_pos":	{
+							"line_nr":	7,
+							"pos":	110,
+							"len":	8
+						}
+					},
+					"pos":	{
+						"line_nr":	7,
+						"pos":	110,
+						"len":	20
+					},
+					"comments":	[]
+				}, {
+					"ast_type":	"Return",
+					"exprs":	[{
+							"ast_type":	"StructInit",
+							"typ":	"T",
+							"is_short":	false,
+							"unresolved":	true,
+							"has_update_expr":	false,
+							"update_expr":	{
+								"ast_type":	"EmptyExpr"
+							},
+							"update_expr_type":	null,
+							"pos":	{
+								"line_nr":	8,
+								"pos":	139,
+								"len":	3
+							},
+							"name_pos":	{
+								"line_nr":	8,
+								"pos":	139,
+								"len":	1
+							},
+							"update_expr_comments":	[],
+							"fields":	[],
+							"embeds":	[],
+							"pre_comments":	[]
+						}],
+					"types":	[],
+					"pos":	{
+						"line_nr":	8,
+						"pos":	132,
+						"len":	10
+					}
+				}],
+			"comments":	[],
+			"next_comments":	[],
+			"label_names":	[],
+			"defer_stmts":	[]
+		}, {
+			"ast_type":	"FnDecl",
+			"name":	"main.main",
+			"mod":	"main",
+			"is_deprecated":	false,
+			"is_pub":	false,
+			"is_variadic":	false,
+			"is_anon":	false,
+			"is_manualfree":	false,
+			"is_main":	true,
+			"is_test":	false,
+			"is_conditional":	false,
+			"is_exported":	false,
+			"is_keep_alive":	false,
+			"receiver":	{
+				"ast_type":	"StructField",
+				"name":	"",
+				"typ":	"void",
+				"type_pos":	{
+					"line_nr":	0,
+					"pos":	0,
+					"len":	0
+				},
+				"has_default_expr":	false,
+				"default_expr_typ":	null,
+				"default_expr":	null,
+				"is_pub":	false,
+				"is_mut":	false,
+				"is_global":	false,
+				"attrs":	[],
+				"comments":	[],
+				"pos":	{
+					"line_nr":	0,
+					"pos":	0,
+					"len":	0
+				}
+			},
+			"receiver_pos":	{
+				"line_nr":	0,
+				"pos":	0,
+				"len":	0
+			},
+			"is_method":	false,
+			"method_idx":	0,
+			"rec_mut":	false,
+			"rec_share":	"enum:0(mut)",
+			"language":	"enum:0(v)",
+			"no_body":	false,
+			"is_builtin":	false,
+			"is_direct_arr":	false,
+			"ctdefine_idx":	-1,
+			"pos":	{
+				"line_nr":	11,
+				"pos":	146,
+				"len":	9
+			},
+			"body_pos":	{
+				"line_nr":	12,
+				"pos":	159,
+				"len":	1
+			},
+			"return_type_pos":	{
+				"line_nr":	11,
+				"pos":	156,
+				"len":	1
+			},
+			"file":	"C:\\Users\\spaceface\\Documents\\git\\v\\vvv\\.\\iter.v",
+			"has_return":	false,
+			"return_type":	"void",
+			"source_file":	0,
+			"scope":	12758752,
+			"attrs":	[],
+			"params":	[],
+			"generic_names":	[],
+			"stmts":	[{
+					"ast_type":	"AssignStmt",
+					"left":	[{
+							"ast_type":	"Ident",
+							"mod":	"main",
+							"name":	"x",
+							"language":	"enum:0(v)",
+							"is_mut":	false,
+							"comptime":	false,
+							"tok_kind":	"token:35(:=)",
+							"kind":	"enum:0(unresolved)",
+							"info":	{
+								"ast_type":	"IdentVar",
+								"typ":	null,
+								"is_mut":	false,
+								"is_static":	false,
+								"is_optional":	false,
+								"share":	"enum:0(mut)"
+							},
+							"pos":	{
+								"line_nr":	12,
+								"pos":	159,
+								"len":	1
+							},
+							"mut_pos":	{
+								"line_nr":	12,
+								"pos":	159,
+								"len":	1
+							},
+							"obj":	{
+							},
+							"scope":	12758752
+						}],
+					"left_types":	[],
+					"right":	[{
+							"ast_type":	"CastExpr",
+							"expr":	{
+								"ast_type":	"StructInit",
+								"typ":	"main.None",
+								"is_short":	false,
+								"unresolved":	false,
+								"has_update_expr":	false,
+								"update_expr":	{
+									"ast_type":	"EmptyExpr"
+								},
+								"update_expr_type":	null,
+								"pos":	{
+									"line_nr":	12,
+									"pos":	181,
+									"len":	6
+								},
+								"name_pos":	{
+									"line_nr":	12,
+									"pos":	181,
+									"len":	4
+								},
+								"update_expr_comments":	[],
+								"fields":	[],
+								"embeds":	[],
+								"pre_comments":	[]
+							},
+							"arg":	{
+								"ast_type":	"EmptyExpr"
+							},
+							"typ":	"main.WeirdOption<int>",
+							"typname":	"",
+							"expr_type":	null,
+							"has_arg":	false,
+							"in_prexpr":	false,
+							"pos":	{
+								"line_nr":	12,
+								"pos":	164,
+								"len":	24
+							}
+						}],
+					"right_types":	[],
+					"op":	"token:35(:=)",
+					"is_static":	false,
+					"is_simple":	false,
+					"has_cross_var":	false,
+					"pos":	{
+						"line_nr":	12,
+						"pos":	161,
+						"len":	2
+					},
+					"comments":	[],
+					"end_comments":	[]
+				}, {
+					"ast_type":	"AssignStmt",
+					"left":	[{
+							"ast_type":	"Ident",
+							"mod":	"",
+							"name":	"_",
+							"language":	"enum:0(v)",
+							"is_mut":	false,
+							"comptime":	false,
+							"tok_kind":	"token:34(=)",
+							"kind":	"enum:1(blank_ident)",
+							"info":	{
+								"ast_type":	"IdentVar",
+								"typ":	null,
+								"is_mut":	false,
+								"is_static":	false,
+								"is_optional":	false,
+								"share":	"enum:0(mut)"
+							},
+							"pos":	{
+								"line_nr":	13,
+								"pos":	190,
+								"len":	1
+							},
+							"mut_pos":	{
+								"line_nr":	0,
+								"pos":	0,
+								"len":	0
+							},
+							"obj":	{
+							},
+							"scope":	12758752
+						}],
+					"left_types":	[],
+					"right":	[{
+							"ast_type":	"Ident",
+							"mod":	"main",
+							"name":	"x",
+							"language":	"enum:0(v)",
+							"is_mut":	false,
+							"comptime":	false,
+							"tok_kind":	"token:47(})",
+							"kind":	"enum:0(unresolved)",
+							"info":	{
+								"ast_type":	"IdentVar",
+								"typ":	null,
+								"is_mut":	false,
+								"is_static":	false,
+								"is_optional":	false,
+								"share":	"enum:0(mut)"
+							},
+							"pos":	{
+								"line_nr":	13,
+								"pos":	194,
+								"len":	1
+							},
+							"mut_pos":	{
+								"line_nr":	13,
+								"pos":	194,
+								"len":	1
+							},
+							"obj":	{
+							},
+							"scope":	12758752
+						}],
+					"right_types":	[],
+					"op":	"token:34(=)",
+					"is_static":	false,
+					"is_simple":	false,
+					"has_cross_var":	false,
+					"pos":	{
+						"line_nr":	13,
+						"pos":	192,
+						"len":	1
+					},
+					"comments":	[],
+					"end_comments":	[]
+				}],
+			"comments":	[],
+			"next_comments":	[],
+			"label_names":	[],
+			"defer_stmts":	[]
+		}]
+}

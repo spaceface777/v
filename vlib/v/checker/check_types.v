@@ -497,7 +497,7 @@ pub fn (mut c Checker) infer_fn_generic_types(f ast.Fn, mut call_expr ast.CallEx
 			if i == 0 && call_expr.is_method && param.typ.has_flag(.generic) {
 				sym := c.table.get_type_symbol(call_expr.receiver_type)
 				match sym.info {
-					ast.Struct, ast.Interface {
+					ast.Struct, ast.Interface, ast.SumType {
 						if c.table.cur_fn.generic_names.len > 0 { // in generic fn
 							if gt_name in c.table.cur_fn.generic_names
 								&& c.table.cur_fn.generic_names.len == c.table.cur_concrete_types.len {
@@ -581,24 +581,25 @@ pub fn (mut c Checker) infer_fn_generic_types(f ast.Fn, mut call_expr ast.CallEx
 					}
 				} else if param.typ.has_flag(.variadic) {
 					to_set = c.table.mktyp(arg.typ)
-				} else if arg_sym.kind == .struct_ && param.typ.has_flag(.generic) {
+				} else if arg_sym.kind in [.struct_, .interface_, .sum_type] && param.typ.has_flag(.generic) {
 					mut generic_types := []ast.Type{}
 					mut concrete_types := []ast.Type{}
-					if mut param_type_sym.info is ast.Struct {
-						generic_types = param_type_sym.info.generic_types
-						concrete_types = param_type_sym.info.concrete_types
-					} else if mut param_type_sym.info is ast.Interface {
-						generic_types = param_type_sym.info.generic_types
-						concrete_types = param_type_sym.info.concrete_types
+					match mut param_type_sym.info {
+						ast.Struct, ast.Interface, ast.SumType {
+							generic_types = param_type_sym.info.generic_types
+							concrete_types = param_type_sym.info.concrete_types
+						}
+						else {}
 					}
 					generic_names := generic_types.map(c.table.get_type_symbol(it).name)
 					if gt_name in generic_names && generic_types.len == concrete_types.len {
 						idx := generic_names.index(gt_name)
 						typ = concrete_types[idx]
 					}
-				}
+					println(generic_types)
+					println(concrete_types)
+		}
 			}
-
 			if to_set != ast.void_type {
 				if typ != ast.void_type {
 					// try to promote

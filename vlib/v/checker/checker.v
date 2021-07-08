@@ -643,7 +643,7 @@ fn (mut c Checker) unwrap_generic_type(kind ast.Kind, typ ast.Type, generic_name
 	mut c_nrt := ''
 	ts := c.table.get_type_symbol(typ)
 	match mut ts.info {
-		ast.Struct, ast.Interface {
+		ast.Struct, ast.Interface, ast.SumType {
 			if !ts.info.is_generic {
 				return typ
 			}
@@ -703,17 +703,6 @@ fn (mut c Checker) unwrap_generic_type(kind ast.Kind, typ ast.Type, generic_name
 			)
 			mut ts_copy := c.table.get_type_symbol(new_idx)
 			mut x := ts.methods.clone()
-			for mut method in x {
-				if t := c.table.resolve_generic_to_concrete(method.return_type, generic_names, concrete_types) {
-					method.return_type = t
-				}
-				for mut param in method.params {
-					if t := c.table.resolve_generic_to_concrete(param.typ, generic_names, concrete_types) {
-						param.typ = t
-					}
-				}
-				ts_copy.register_method(method)
-			}
 
 			return ast.new_type(new_idx).derive(typ).clear_flag(.generic)
 		}
@@ -2833,7 +2822,6 @@ fn (mut c Checker) type_implements(typ ast.Type, interface_type ast.Type, pos to
 	$if debug_interface_type_implements ? {
 		eprintln('> type_implements typ: $typ.debug() | inter_typ: $interface_type.debug()')
 	}
-	println(c.table.type_symbols)
 	utyp := c.unwrap_generic(typ)
 	typ_sym := c.table.get_type_symbol(utyp)
 	mut inter_sym := c.table.get_type_symbol(interface_type)
@@ -5228,7 +5216,7 @@ pub fn (mut c Checker) cast_expr(mut node ast.CastExpr) ast.Type {
 	} else if from_type_sym.kind == .struct_ && !node.expr_type.is_ptr() {
 		if (node.typ.is_ptr() || to_type_sym.kind !in [.sum_type, .interface_]) && !c.is_builtin_mod {
 			type_name := c.table.type_to_str(node.typ)
-			c.error('cannot cast struct to `$type_name`', node.pos)
+			c.error('cannot cast struct to `$type_name` $to_type_sym.kind', node.pos)
 		}
 	} else if node.expr_type.has_flag(.optional) || node.expr_type.has_flag(.variadic) {
 		// variadic case can happen when arrays are converted into variadic

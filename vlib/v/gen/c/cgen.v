@@ -517,6 +517,9 @@ pub fn (mut g Gen) write_typeof_functions() {
 	for typ in g.table.type_symbols {
 		if typ.kind == .sum_type {
 			sum_info := typ.info as ast.SumType
+			if sum_info.is_generic {
+				continue
+			}
 			g.writeln('static char * v_typeof_sumtype_${typ.cname}(int sidx) { /* $typ.name */ ')
 			if g.pref.build_mode == .build_module {
 				g.writeln('\t\tif( sidx == _v_type_idx_${typ.cname}() ) return "${util.strip_main_name(typ.name)}";')
@@ -725,7 +728,7 @@ fn (mut g Gen) cc_type(typ ast.Type, is_prefix_struct bool) string {
 	// println('$styp - $sym.info.type_name()')
 	// TODO: this needs to be removed; cgen shouldn't resolve generic types (job of checker)
 	match mut sym.info {
-		ast.Struct, ast.Interface {
+		ast.Struct, ast.Interface, ast.SumType {
 			if sym.info.is_generic {
 				mut sgtyps := '_T'
 				for gt in sym.info.generic_types {
@@ -767,13 +770,13 @@ fn (g &Gen) type_sidx(t ast.Type) string {
 
 //
 pub fn (mut g Gen) write_typedef_types() {
-	for typ in g.table.type_symbols {
+	for i, typ in g.table.type_symbols {
 		if typ.name in c.builtins {
 			continue
 		}
 		match typ.kind {
 			.array {
-				g.type_definitions.writeln('typedef array $typ.cname;')
+				g.type_definitions.writeln('typedef array $typ.cname; // $i | Array<${g.table.get_type_symbol((typ.info as ast.Array).elem_type).kind}>')
 			}
 			.array_fixed {
 				info := typ.info as ast.ArrayFixed
@@ -5394,6 +5397,9 @@ fn (mut g Gen) write_types(types []ast.TypeSymbol) {
 				}
 			}
 			ast.SumType {
+				if typ.info.is_generic {
+					continue
+				}
 				g.typedefs.writeln('typedef struct $name $name;')
 				g.type_definitions.writeln('')
 				g.type_definitions.writeln('// Union sum type $name = ')
