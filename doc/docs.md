@@ -505,6 +505,18 @@ s := '42'
 n := s.int() // 42
 ```
 
+### Runes
+A `rune` represents a unicode character and is an alias for `u32`. Runes can be created like this:
+```v
+x := `🚀`
+```
+
+A string can be converted to runes by the `.runes()` method.
+```v
+hello := 'Hello World 👋'
+hello_runes := hello.runes() // [`H`, `e`, `l`, `l`, `o`, ` `, `W`, `o`, `r`, `l`, `d`, ` `, `👋`]
+```
+
 ### String interpolation
 
 Basic interpolation syntax is pretty simple - use `$` before a variable name.
@@ -625,11 +637,11 @@ println(nums) // `[1, 5, 3]`
 ```
 #### Array Properties
 There are two properties that control the "size" of an array:
-* `len`: *length* - the number of defined elements of the array
-* `cap`: *capacity* - the number of elements for which memory space has been reserved. The array can
-grow up to this size without being reallocated. Usually, V takes care of
-this property automatically but there are cases where the user may want to do manual
-optimizations (see [below](#array-initialization)).
+* `len`: *length* - the number of pre-allocated and initialized elements in the array
+* `cap`: *capacity* - the amount of memory space which has been reserved for elements,
+but not initialized or counted as elements. The array can grow up to this size without
+being reallocated. Usually, V takes care of this property automatically but there are
+cases where the user may want to do manual optimizations (see [below](#array-initialization)).
 
 ```v
 mut nums := [1, 2, 3]
@@ -1318,6 +1330,45 @@ for mut num in numbers {
 println(numbers) // [1, 2, 3]
 ```
 When an identifier is just a single underscore, it is ignored.
+
+##### Custom iterators
+Types that implement a `next` method returning an `Option` can be iterated
+with a `for` loop.
+
+```v
+struct SquareIterator {
+	arr []int
+mut:
+	idx int
+}
+
+fn (mut iter SquareIterator) next() ?int {
+	if iter.idx >= iter.arr.len {
+		return error('')
+	}
+	defer {
+		iter.idx++
+	}
+	return iter.arr[iter.idx] * iter.arr[iter.idx]
+}
+
+nums := [1, 2, 3, 4, 5]
+iter := SquareIterator{
+	arr: nums
+}
+for squared in iter {
+	println(squared)
+}
+```
+
+The code above prints:
+```
+1
+4
+9
+16
+25
+```
 
 ##### Map `for`
 
@@ -2675,6 +2726,50 @@ fn main() {
 }
 ```
 
+Enums can have methods, just like structs
+
+```v
+enum Cycle {
+	one
+	two
+	three
+}
+
+fn (c Cycle) next() Cycle {
+	match c {
+		.one {
+			return .two
+		}
+		.two {
+			return .three
+		}
+		.three {
+			return .one
+		}
+	}
+}
+
+mut c := Cycle.one
+for _ in 0 .. 10 {
+	println(c)
+	c = c.next()
+}
+```
+
+Output:
+```
+one
+two
+three
+one
+two
+three
+one
+two
+three
+one
+```
+
 #### Dynamic casts
 
 To check whether a sum type instance holds a certain type, use `sum is Type`.
@@ -3417,7 +3512,7 @@ You can also define special test functions in a test file:
 
 If a test function has an error return type, any propagated errors will fail the test:
 
-```
+```v
 import strconv
 
 fn test_atoi() ? {
@@ -3921,6 +4016,18 @@ If no flags are passed it will add `--cflags` and `--libs`, both lines below do 
 
 The `.pc` files are looked up into a hardcoded list of default pkg-config paths, the user can add
 extra paths by using the `PKG_CONFIG_PATH` environment variable. Multiple modules can be passed.
+
+To check the existance of a pkg-config use `$pkgconfig('pkg')` as a compile time if condition to 
+check if a pkg-config exists. If it exists the branch will be created. Use `$else` or `$else $if`
+to handle other cases.
+
+```v ignore
+$if $pkgconfig('mysqlclient') {
+	#pkgconfig mysqlclient
+} $else $if $pkgconfig('mariadb') {
+	#pkgconfig mariadb
+}
+```
 
 ### Including C code
 
@@ -4543,7 +4650,6 @@ Translating it to V gives you several advantages:
 module main
 
 import time
-import os
 
 [live]
 fn print_message() {
@@ -4667,6 +4773,21 @@ fn legacy_function() {}
 // This function's calls will be inlined.
 [inline]
 fn inlined_function() {
+}
+
+// This function's calls will NOT be inlined.
+[noinline]
+fn function() {
+}
+
+// This function will NOT return to its callers.
+// Such functions can be used at the end of or blocks,
+// just like exit/1 or panic/1. Such functions can not
+// have return types, and should end either in for{}, or
+// by calling other `[noreturn]` functions.
+[noreturn]
+fn forever() {
+	for {}
 }
 
 // The following struct must be allocated on the heap. Therefore, it can only be used as a

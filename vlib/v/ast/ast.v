@@ -363,6 +363,7 @@ pub:
 	is_pub          bool
 	is_variadic     bool
 	is_anon         bool
+	is_noreturn     bool           // true, when [noreturn] is used on a fn
 	is_manualfree   bool           // true, when [manualfree] is used on a fn
 	is_main         bool           // true for `fn main()`
 	is_test         bool           // true for `fn test_abcde`
@@ -421,6 +422,7 @@ pub mut:
 	is_method          bool
 	is_field           bool // temp hack, remove ASAP when re-impl CallExpr / Selector (joe)
 	is_keep_alive      bool // GC must not free arguments before fn returns
+	is_noreturn        bool // whether the function/method is marked as [noreturn]
 	args               []CallArg
 	expected_arg_types []Type
 	language           Language
@@ -729,8 +731,9 @@ pub:
 	body_pos token.Position
 	comments []Comment
 pub mut:
-	stmts []Stmt
-	scope &Scope
+	pkg_exist bool
+	stmts     []Stmt
+	scope     &Scope
 }
 
 pub struct UnsafeExpr {
@@ -773,7 +776,8 @@ pub:
 	stmts         []Stmt      // right side
 	pos           token.Position
 	is_else       bool
-	post_comments []Comment // comments below ´... }´
+	post_comments []Comment      // comments below ´... }´
+	branch_pos    token.Position // for checker errors about invalid branches
 pub mut:
 	exprs []Expr // left side
 	scope &Scope
@@ -1436,6 +1440,8 @@ pub:
 	//
 	is_env  bool
 	env_pos token.Position
+	//
+	is_pkgconfig bool
 pub mut:
 	sym         TypeSymbol
 	result_type Type

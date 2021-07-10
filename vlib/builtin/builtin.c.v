@@ -4,7 +4,13 @@ type FnExitCb = fn ()
 
 fn C.atexit(f FnExitCb) int
 
+[noreturn]
+fn vhalt() {
+	for {}
+}
+
 // exit terminates execution immediately and returns exit `code` to the shell.
+[noreturn]
 pub fn exit(code int) {
 	C.exit(code)
 }
@@ -17,6 +23,7 @@ fn vcommithash() string {
 // recent versions of tcc print nicer backtraces automatically
 // NB: the duplication here is because tcc_backtrace should be called directly
 // inside the panic functions.
+[noreturn]
 fn panic_debug(line_no int, file string, mod string, fn_name string, s string) {
 	// NB: the order here is important for a stabler test output
 	// module is less likely to change than function, etc...
@@ -52,14 +59,17 @@ fn panic_debug(line_no int, file string, mod string, fn_name string, s string) {
 			C.exit(1)
 		}
 	}
+	vhalt()
 }
 
+[noreturn]
 pub fn panic_optional_not_set(s string) {
 	panic('optional not set ($s)')
 }
 
 // panic prints a nice error message, then exits the process with exit code of 1.
 // It also shows a backtrace on most platforms.
+[noreturn]
 pub fn panic(s string) {
 	$if freestanding {
 		bare_panic(s)
@@ -87,6 +97,7 @@ pub fn panic(s string) {
 			C.exit(1)
 		}
 	}
+	vhalt()
 }
 
 // eprintln prints a message with a line end, to stderr. Both stderr and stdout are flushed.
@@ -141,10 +152,10 @@ pub fn eprint(s string) {
 [manualfree]
 pub fn print(s string) {
 	$if android {
-		// android print for logcat
-		C.fprintf(C.stdout, c'%.*s', s.len, s.str)
-		_write_buf_to_fd(1, s.str, s.len)
-	} $else $if ios {
+		C.fprintf(C.stdout, c'%.*s', s.len, s.str) // logcat
+	}
+	// no else if for android termux support
+	$if ios {
 		// TODO: Implement a buffer as NSLog doesn't have a "print"
 		C.WrappedNSLog(s.str)
 	} $else $if freestanding {
@@ -161,13 +172,13 @@ pub fn println(s string) {
 		println('println(NIL)')
 		return
 	}
+	$if android {
+		C.fprintf(C.stdout, c'%.*s\n', s.len, s.str) // logcat
+		return
+	}
+	// no else if for android termux support
 	$if ios {
 		C.WrappedNSLog(s.str)
-		return
-	} $else $if android {
-		// android print for logcat
-		C.fprintf(C.stdout, c'%.*s\n', s.len, s.str)
-		_writeln_to_fd(1, s)
 		return
 	} $else $if freestanding {
 		bare_print(s.str, u64(s.len))
