@@ -137,12 +137,12 @@ fn (mut g Gen) gen_fn_decl(node &ast.FnDecl, skip bool) {
 	defer {
 		g.is_autofree = old_g_autofree
 	}
+	g.writeln('// hi: $node.name $node.generic_names ${g.table.fn_generic_types}')
 	//
 	// if g.fileis('vweb.v') {
 	// println('\ngen_fn_decl() $node.name $node.is_generic $g.cur_generic_type')
 	// }
 	if node.generic_names.len > 0 && g.table.cur_concrete_types.len == 0 { // need the cur_concrete_type check to avoid inf. recursion
-		println('>> hi: $node.name >>')
 		// current: check g.table.fn_generic_types
 		// loop thru each generic type and generate a function
 		for concrete_types in g.table.fn_generic_types[node.name] {
@@ -157,6 +157,7 @@ fn (mut g Gen) gen_fn_decl(node &ast.FnDecl, skip bool) {
 		g.table.cur_concrete_types = []
 		return
 	}
+	g.writeln('// hi: $node.name')
 	cur_fn_save := g.table.cur_fn
 	defer {
 		g.table.cur_fn = cur_fn_save
@@ -554,12 +555,6 @@ fn (mut g Gen) method_call(node ast.CallExpr) {
 	typ_sym := g.table.get_type_symbol(unwrapped_rec_type)
 	rec_cc_type := g.cc_type(unwrapped_rec_type, false)
 	mut receiver_type_name := util.no_dots(rec_cc_type)
-
-	// MUST be removed before merging:
-	if receiver_type_name == 'main__Iterator<>' {
-		receiver_type_name = 'main__Iterator_T_int'
-	}
-
 	if typ_sym.kind == .interface_ && (typ_sym.info as ast.Interface).defines_method(node.name) {
 		// Speaker_name_table[s._interface_idx].speak(s._object)
 		$if debug_interface_method_call ? {

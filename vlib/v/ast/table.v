@@ -1185,7 +1185,6 @@ pub fn (mut t Table) resolve_generic_to_concrete(generic_type Type, generic_name
 	}
 	match mut sym.info {
 		Array {
-			println(' >> $sym $sym.info')
 			mut elem_type := sym.info.elem_type
 			mut elem_sym := t.get_type_symbol(elem_type)
 			mut dims := 1

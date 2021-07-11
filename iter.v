@@ -36,21 +36,22 @@ fn extract<T>(xs []Gettable<T>) []T {
   return xs.map(it.get())
 }
 
-fn extract_basic<T>(xs Gettable<T>) T {
-  return xs.get()
-}
-
-
 fn main() {
 	a := Animal<int>{ 123 }
 	b := Animal<int>{ 456 }
 
-	// arr := [Gettable<int>(a), Gettable<int>(b)]
-	// dump(typeof(arr).name)
-	// x := extract<int>(arr)
-	// println(x)
+	arr := [Gettable<int>(a), Gettable<int>(b)]
+	dump(typeof(arr).name)
+	x := extract<int>(arr)
+	println(x)
 
-	aa := extract_basic(a)
-	bb := extract_basic(b)
-	println('$aa | $bb')
+
+	c := Animal<string>{ '123' }
+	d := Animal<string>{ '456' }
+
+	arr2 := [Gettable<string>(c), Gettable<string>(d)]
+	dump(typeof(arr2).name)
+	y := extract<string>(arr2)
+	println(y)
+
 }

@@ -3,7 +3,7 @@
 // that can be found in the LICENSE file.
 module math
 
-// aprox_sin returns an approximation of sin(a) made using lolremez
+// aprox_sns an approximation of sin(a) made using lolremez
 pub fn aprox_sin(a f64) f64 {
 	a0 := 1.91059300966915117e-31
 	a1 := 1.00086760103908896

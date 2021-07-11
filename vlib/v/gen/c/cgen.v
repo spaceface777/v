@@ -901,7 +901,7 @@ pub fn (mut g Gen) write_interface_typesymbol_declaration(sym ast.TypeSymbol) {
 	if info.is_generic {
 		return
 	}
-	struct_name := c_name(sym.name)
+	struct_name := c_name(sym.cname)
 	g.type_definitions.writeln('typedef struct $struct_name $struct_name;')
 	g.type_definitions.writeln('struct $struct_name {')
 	g.type_definitions.writeln('\tunion {')
@@ -1870,22 +1870,22 @@ fn (mut g Gen) expr_with_cast(expr ast.Expr, got_type_raw ast.Type, expected_typ
 			g.inside_cast_in_heap++
 			got_styp := g.cc_type(got_type.to_ptr(), true)
 			exp_styp := g.cc_type(expected_type, true)
-			fname := 'I_${got_styp}_to_Interface_$exp_styp'
-			// g.write('/* ${(exp_sym.info as ast.Interface).is_generic} */')
-			// if (exp_sym.info as ast.Interface).is_generic {
-			// 	fname = 'I_${got_styp}_to_Interface_${exp_sym.cname}_T_int'
-			// }
+			mut fname := 'I_${got_styp}_to_Interface_$exp_styp'
+			g.write('/* ${(exp_sym.info as ast.Interface).is_generic} */')
+			if (exp_sym.info as ast.Interface).is_generic {
+				fname = 'I_${got_styp}_to_Interface_${exp_sym.cname}_T_int'
+			}
 			g.call_cfn_for_casting_expr(fname, expr, expected_is_ptr, exp_styp, true,
 				got_styp)
 			g.inside_cast_in_heap--
 		} else {
 			got_styp := g.cc_type(got_type, true)
 			exp_styp := g.cc_type(expected_type, true)
-			fname := 'I_${got_styp}_to_Interface_$exp_styp'
-			// g.write('/* ${(exp_sym.info as ast.Interface).is_generic} */')
-			// if (exp_sym.info as ast.Interface).is_generic {
-			// 	fname = 'I_${got_styp}_to_Interface_${exp_sym.cname}_T_int'
-			// }
+			mut fname := 'I_${got_styp}_to_Interface_$exp_styp'
+			g.write('/* ${(exp_sym.info as ast.Interface).is_generic} */')
+			if (exp_sym.info as ast.Interface).is_generic {
+				fname = 'I_${got_styp}_to_Interface_${exp_sym.cname}_T_int'
+			}
 			g.call_cfn_for_casting_expr(fname, expr, expected_is_ptr, exp_styp, got_is_ptr,
 				got_styp)
 		}
@@ -6271,13 +6271,27 @@ static inline $interface_name I_${cctype}_to_Interface_${interface_name}($cctype
 					}
 				}
 			}
-			for _, method in st_sym.methods {
+			for _, method_ in st_sym.methods {
+				mut method := method_
+				mut name := method.name
+				if inter_info.parent_type.has_flag(.generic) {
+					parent_sym := g.table.get_type_symbol(inter_info.parent_type)
+					// .speak = Cat_speak
+					match mut parent_sym.info {
+						ast.Struct, ast.Interface, ast.SumType {
+							name = g.generic_fn_name(parent_sym.info.concrete_types, method.name, false)
+						} else {
+							verror('hi')
+						}
+					}
+				}
+
 				if method.name !in methodidx {
 					// a method that is not part of the interface should be just skipped
 					continue
 				}
-				// .speak = Cat_speak
-				mut method_call := '${cctype}_$method.name'
+
+				mut method_call := '${cctype}_$name'
 				if !method.params[0].typ.is_ptr() {
 					// inline void Cat_speak_Interface_Animal_method_wrapper(Cat c) { return Cat_speak(*c); }
 					iwpostfix := '_Interface_${interface_name}_method_wrapper'
