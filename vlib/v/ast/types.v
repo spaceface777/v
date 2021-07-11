@@ -760,6 +760,11 @@ pub mut:
 	fields  []StructField
 	methods []Fn
 	ifaces  []Type
+	// generic interface support
+	is_generic     bool
+	generic_types  []Type
+	concrete_types []Type
+	parent_type    Type
 }
 
 pub struct Enum {
@@ -841,11 +846,15 @@ pub mut:
 }
 
 pub struct SumType {
-pub:
-	variants []Type
 pub mut:
+	variants     []Type
 	fields       []StructField
 	found_fields bool
+	// generic sumtype support
+	is_generic     bool
+	generic_types  []Type
+	concrete_types []Type
+	parent_type    Type
 }
 
 // human readable type name
