@@ -2994,18 +2994,31 @@ fn (mut c Checker) resolve_generic_interface(typ ast.Type, interface_type ast.Ty
 
 fn (mut c Checker) type_implements(typ ast.Type, interface_type ast.Type, pos token.Position) bool {
 	$if debug_interface_type_implements ? {
-		eprintln('> type_implements typ: $typ.debug() | inter_typ: $interface_type.debug()')
+		eprintln('> type_implements typ: $typ.debug() ${c.table.type_to_str(typ)} | inter_typ: $interface_type.debug() ${c.table.type_to_str(interface_type)}')
 	}
 	utyp := c.unwrap_generic(typ)
 	typ_sym := c.table.get_type_symbol(utyp)
 	mut inter_sym := c.table.get_type_symbol(interface_type)
 	if mut inter_sym.info is ast.Interface {
-		if inter_sym.info.is_generic {
-			inferred_type := c.resolve_generic_interface(typ, interface_type, pos)
-			c.warn('inferred: ${c.table.type_to_str(inferred_type)} | ${c.table.type_to_str(typ)} ${c.table.type_to_str(utyp)} ${c.table.type_to_str(interface_type)}', pos)
+		mut generic_type := interface_type
+		mut generic_info := inter_sym.info
+		if inter_sym.info.parent_type.has_flag(.generic) {
+			parent_sym := c.table.get_type_symbol(inter_sym.info.parent_type)
+			println('$inter_sym -> $parent_sym $parent_sym.info')
+			if parent_sym.info is ast.Interface {
+				generic_type = inter_sym.info.parent_type
+				generic_info = parent_sym.info
+			}
+		}
+		mut inferred_type := interface_type
+		if generic_info.is_generic {
+			inferred_type = c.resolve_generic_interface(typ, generic_type, pos)
+			c.warn('inferred: ${c.table.type_to_str(inferred_type)} | ${c.table.type_to_str(typ)} ${c.table.type_to_str(utyp)} ${c.table.type_to_str(generic_type)}', pos)
 			if inferred_type == 0 {
 				return false
 			}
+		}
+		if inter_sym.info.is_generic {
 			return c.type_implements(typ, inferred_type, pos)
 		}
 	}	// do not check the same type more than once
@@ -3440,7 +3453,7 @@ pub fn (mut c Checker) return_stmt(mut node ast.Return) {
 				}
 				continue
 			}
-			c.error('cannot use `$got_typ_sym.name` as type `${c.table.type_to_str(exp_type)}` in return argument $c.table.cur_fn',
+			c.error('cannot use `$got_typ_sym.name` as type `${c.table.type_to_str(exp_type)}` in return argument ${c.table.cur_fn.params.map(c.table.type_to_str(c.unwrap_generic(it.typ)))} ${c.table.type_to_str(c.unwrap_generic(c.table.cur_fn.return_type))}',
 				pos)
 		}
 		if (got_typ.is_ptr() || got_typ.is_pointer())

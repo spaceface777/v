@@ -6280,9 +6280,7 @@ static inline $interface_name I_${cctype}_to_Interface_${interface_name}($cctype
 					match mut parent_sym.info {
 						ast.Struct, ast.Interface, ast.SumType {
 							name = g.generic_fn_name(parent_sym.info.concrete_types, method.name, false)
-						} else {
-							verror('hi')
-						}
+						} else {}
 					}
 				}
 
