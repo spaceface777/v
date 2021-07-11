@@ -6248,7 +6248,30 @@ static inline $interface_name I_${cctype}_to_Interface_${interface_name}($cctype
 					}
 				}
 			}
-			for _, method in st_sym.methods {
+			mut methods := st_sym.methods
+			match st_sym.info {
+				ast.Struct, ast.Interface, ast.SumType {
+					if st_sym.info.parent_type.has_flag(.generic) {
+						parent_sym := g.table.get_type_symbol(st_sym.info.parent_type)
+						for method in parent_sym.methods {
+							if method.name in methodidx {
+								methods << st_sym.find_method_with_generic_parent(method.name) or { continue }
+							}
+						}
+					}
+				} else {}
+			}
+			for method in methods {
+				mut name := method.name
+				if inter_info.parent_type.has_flag(.generic) {
+					parent_sym := g.table.get_type_symbol(inter_info.parent_type)
+					match mut parent_sym.info {
+						ast.Struct, ast.Interface, ast.SumType {
+							name = g.generic_fn_name(parent_sym.info.concrete_types, method.name, false)
+						} else {}
+					}
+				}
+
 				if method.name !in methodidx {
 					// a method that is not part of the interface should be just skipped
 					continue
