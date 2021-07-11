@@ -3439,8 +3439,9 @@ fn (mut g Gen) expr(node ast.Expr) {
 			// match sum Type
 			// g.write('/* Type */')
 			// type_idx := node.typ.idx()
-			sym := g.table.get_type_symbol(node.typ)
-			sidx := g.type_sidx(node.typ)
+			typ := g.unwrap_generic(node.typ)
+			sym := g.table.get_type_symbol(typ)
+			sidx := g.type_sidx(typ)
 			// g.write('$type_idx /* $sym.name */')
 			g.write('$sidx /* $sym.name */')
 		}
@@ -3857,7 +3858,7 @@ fn (mut g Gen) match_expr_sumtype(node ast.MatchExpr, is_expr bool, cond_var str
 				} else if sym.kind == .interface_ {
 					if branch.exprs[sumtype_index] is ast.TypeNode {
 						typ := branch.exprs[sumtype_index] as ast.TypeNode
-						branch_sym := g.table.get_type_symbol(typ.typ)
+						branch_sym := g.table.get_type_symbol(g.unwrap_generic(typ.typ))
 						g.write('${dot_or_ptr}_typ == _${sym.cname}_${branch_sym.cname}_index')
 					} else if branch.exprs[sumtype_index] is ast.None && sym.name == 'IError' {
 						g.write('${dot_or_ptr}_typ == _IError_None___index')
@@ -4266,7 +4267,7 @@ fn (mut g Gen) ident(node ast.Ident) {
 						}
 					}
 					for i, typ in v.smartcasts {
-						cast_sym := g.table.get_type_symbol(typ)
+						cast_sym := g.table.get_type_symbol(g.unwrap_generic(typ))
 						mut is_ptr := false
 						if i == 0 {
 							g.write(name)
