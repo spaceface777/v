@@ -755,7 +755,8 @@ fn (mut g Gen) cc_type(typ ast.Type, is_prefix_struct bool) string {
 				}
 				styp += sgtyps
 			}
-		} ast.MultiReturn {
+		}
+		ast.MultiReturn {
 			// TODO: this doesn't belong here, but makes it working for now
 			mut cname := 'multi_return'
 			for mr_typ in sym.info.types {
@@ -763,7 +764,8 @@ fn (mut g Gen) cc_type(typ ast.Type, is_prefix_struct bool) string {
 				cname += '_$mr_type_sym.cname'
 			}
 			return cname
-		} else {}
+		}
+		else {}
 	}
 	if is_prefix_struct && styp.starts_with('C__') {
 		styp = styp[3..]
@@ -6280,11 +6282,14 @@ static inline $interface_name I_${cctype}_to_Interface_${interface_name}($cctype
 						parent_sym := g.table.get_type_symbol(st_sym.info.parent_type)
 						for method in parent_sym.methods {
 							if method.name in methodidx {
-								methods << st_sym.find_method_with_generic_parent(method.name) or { continue }
+								methods << st_sym.find_method_with_generic_parent(method.name) or {
+									continue
+								}
 							}
 						}
 					}
-				} else {}
+				}
+				else {}
 			}
 			for method in methods {
 				mut name := method.name
@@ -6292,8 +6297,10 @@ static inline $interface_name I_${cctype}_to_Interface_${interface_name}($cctype
 					parent_sym := g.table.get_type_symbol(inter_info.parent_type)
 					match mut parent_sym.info {
 						ast.Struct, ast.Interface, ast.SumType {
-							name = g.generic_fn_name(parent_sym.info.concrete_types, method.name, false)
-						} else {}
+							name = g.generic_fn_name(parent_sym.info.concrete_types, method.name,
+								false)
+						}
+						else {}
 					}
 				}
 

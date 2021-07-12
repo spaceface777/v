@@ -693,7 +693,8 @@ fn (mut c Checker) unwrap_generic_type(typ ast.Type, generic_names []string, con
 					}
 				}
 			}
-		} else {}
+		}
+		else {}
 	}
 	match mut ts.info {
 		ast.Struct {
@@ -715,11 +716,15 @@ fn (mut c Checker) unwrap_generic_type(typ ast.Type, generic_names []string, con
 			// resolve generic types inside methods
 			mut imethods := ts.info.methods.clone()
 			for mut method in imethods {
-				if t := c.table.resolve_generic_to_concrete(method.return_type, generic_names, concrete_types) {
+				if t := c.table.resolve_generic_to_concrete(method.return_type, generic_names,
+					concrete_types)
+				{
 					method.return_type = t
 				}
 				for mut param in method.params {
-					if t := c.table.resolve_generic_to_concrete(param.typ, generic_names, concrete_types) {
+					if t := c.table.resolve_generic_to_concrete(param.typ, generic_names,
+						concrete_types)
+					{
 						param.typ = t
 					}
 				}
@@ -776,8 +781,8 @@ pub fn (mut c Checker) generic_insts_to_concrete() {
 							if fields[i].typ.has_flag(.generic) {
 								sym := c.table.get_type_symbol(fields[i].typ)
 								if sym.kind == .struct_ && fields[i].typ.idx() != info.parent_idx {
-									fields[i].typ = c.unwrap_generic_type(fields[i].typ, generic_names,
-										info.concrete_types)
+									fields[i].typ = c.unwrap_generic_type(fields[i].typ,
+										generic_names, info.concrete_types)
 								} else {
 									if t_typ := c.table.resolve_generic_to_concrete(fields[i].typ,
 										generic_names, info.concrete_types)
@@ -801,14 +806,15 @@ pub fn (mut c Checker) generic_insts_to_concrete() {
 						typ.is_public = true
 						typ.kind = parent.kind
 					}
-				} ast.Interface {
+				}
+				ast.Interface {
 					mut parent_info := parent.info as ast.Interface
 					if parent_info.generic_types.len == info.concrete_types.len {
 						mut fields := parent_info.fields.clone()
 						generic_names := parent_info.generic_types.map(c.table.get_type_symbol(it).name)
 						for i in 0 .. fields.len {
-							if t_typ := c.table.resolve_generic_to_concrete(fields[i].typ, generic_names,
-								info.concrete_types)
+							if t_typ := c.table.resolve_generic_to_concrete(fields[i].typ,
+								generic_names, info.concrete_types)
 							{
 								fields[i].typ = t_typ
 							}
@@ -816,12 +822,16 @@ pub fn (mut c Checker) generic_insts_to_concrete() {
 						mut imethods := parent_info.methods.clone()
 						for mut method in imethods {
 							method.generic_names.clear()
-							if pt := c.table.resolve_generic_to_concrete(method.return_type, generic_names, info.concrete_types) {
+							if pt := c.table.resolve_generic_to_concrete(method.return_type,
+								generic_names, info.concrete_types)
+							{
 								method.return_type = pt
 							}
 							method.params = method.params.clone()
 							for mut param in method.params {
-								if pt := c.table.resolve_generic_to_concrete(param.typ, generic_names, info.concrete_types) {
+								if pt := c.table.resolve_generic_to_concrete(param.typ,
+									generic_names, info.concrete_types)
+								{
 									param.typ = pt
 								}
 							}
@@ -847,22 +857,23 @@ pub fn (mut c Checker) generic_insts_to_concrete() {
 						typ.kind = parent.kind
 						typ.methods = all_methods
 					}
-				} ast.SumType {
+				}
+				ast.SumType {
 					mut parent_info := parent.info as ast.SumType
 					if parent_info.generic_types.len == info.concrete_types.len {
 						mut fields := parent_info.fields.clone()
 						mut variants := parent_info.variants.clone()
 						generic_names := parent_info.generic_types.map(c.table.get_type_symbol(it).name)
 						for i in 0 .. fields.len {
-							if t_typ := c.table.resolve_generic_to_concrete(fields[i].typ, generic_names,
-								info.concrete_types)
+							if t_typ := c.table.resolve_generic_to_concrete(fields[i].typ,
+								generic_names, info.concrete_types)
 							{
 								fields[i].typ = t_typ
 							}
 						}
 						for i in 0 .. variants.len {
-							if t_typ := c.table.resolve_generic_to_concrete(variants[i], generic_names,
-								info.concrete_types)
+							if t_typ := c.table.resolve_generic_to_concrete(variants[i],
+								generic_names, info.concrete_types)
 							{
 								variants[i] = t_typ
 							}
@@ -878,7 +889,8 @@ pub fn (mut c Checker) generic_insts_to_concrete() {
 						typ.is_public = true
 						typ.kind = parent.kind
 					}
-				} else {}
+				}
+				else {}
 			}
 		}
 	}
@@ -2949,9 +2961,7 @@ fn (mut c Checker) resolve_generic_interface(typ ast.Type, interface_type ast.Ty
 			}
 			for imethod in inter_sym.info.methods {
 				method := typ_sym.find_method(imethod.name) or {
-					typ_sym.find_method_with_generic_parent(imethod.name) or {
-						ast.Fn{}
-					}
+					typ_sym.find_method_with_generic_parent(imethod.name) or { ast.Fn{} }
 				}
 				if imethod.return_type.has_flag(.generic) {
 					if method.return_type !in inferred_types {
@@ -2971,11 +2981,13 @@ fn (mut c Checker) resolve_generic_interface(typ ast.Type, interface_type ast.Ty
 				}
 			}
 			if inferred_types.len == 0 {
-				c.error('cannot infer generic types for ${c.table.type_to_str(interface_type)}', pos)
+				c.error('cannot infer generic types for ${c.table.type_to_str(interface_type)}',
+					pos)
 				return ast.void_type
 			}
 			if inferred_types.len > 1 {
-				c.error('cannot infer generic types for ${c.table.type_to_str(interface_type)}: got conflicting type information', pos)
+				c.error('cannot infer generic types for ${c.table.type_to_str(interface_type)}: got conflicting type information',
+					pos)
 				return ast.void_type
 			}
 			inferred_type := inferred_types[0]
@@ -3048,7 +3060,7 @@ fn (mut c Checker) type_implements(typ ast.Type, interface_type ast.Type, pos to
 		// Verify methods
 		for imethod in imethods {
 			method := typ_sym.find_method(imethod.name) or {
-					typ_sym.find_method_with_generic_parent(imethod.name) or {
+				typ_sym.find_method_with_generic_parent(imethod.name) or {
 					c.error("`$styp` doesn't implement method `$imethod.name` of interface `$inter_sym.name`",
 						pos)
 					continue

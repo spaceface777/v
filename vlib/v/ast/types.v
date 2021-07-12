@@ -973,7 +973,7 @@ pub fn (t &Table) type_to_str_using_aliases(typ Type, import_aliases map[string]
 			}
 			res += ')'
 		}
-		.struct_, .interface_, .sum_type	 {
+		.struct_, .interface_, .sum_type {
 			if typ.has_flag(.generic) {
 				match sym.info {
 					Struct, Interface, SumType {
@@ -985,7 +985,8 @@ pub fn (t &Table) type_to_str_using_aliases(typ Type, import_aliases map[string]
 							}
 						}
 						res += '>'
-					} else {}
+					}
+					else {}
 				}
 			} else {
 				res = t.shorten_user_defined_typenames(res, import_aliases)
@@ -1149,22 +1150,29 @@ pub fn (t &TypeSymbol) find_method_with_generic_parent(name string) ?Fn {
 						Struct, Interface, SumType {
 							mut method := x
 							generic_names := parent_sym.info.generic_types.map(table.get_type_symbol(it).name)
-							if rt := table.resolve_generic_to_concrete(method.return_type, generic_names, t.info.concrete_types) {
+							if rt := table.resolve_generic_to_concrete(method.return_type,
+								generic_names, t.info.concrete_types)
+							{
 								method.return_type = rt
 							}
 							method.params = method.params.clone()
 							for mut param in method.params {
-								if pt := table.resolve_generic_to_concrete(param.typ, generic_names, t.info.concrete_types) {
+								if pt := table.resolve_generic_to_concrete(param.typ,
+									generic_names, t.info.concrete_types)
+								{
 									param.typ = pt
 								}
 							}
 							method.generic_names.clear()
 							return method
-						} else {}
+						}
+						else {}
 					}
-				} else {}
+				} else {
+				}
 			}
-		} else {}
+		}
+		else {}
 	}
 	return none
 }

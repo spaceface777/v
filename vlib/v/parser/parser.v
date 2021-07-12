@@ -1920,7 +1920,7 @@ fn (mut p Parser) is_generic_cast() bool {
 			break
 		}
 
-		if i > 20 || tok.kind !in valid_tokens_inside_types {
+		if i > 20 || tok.kind !in parser.valid_tokens_inside_types {
 			return false
 		}
 	}
