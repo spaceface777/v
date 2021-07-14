@@ -557,6 +557,7 @@ pub fn (mut c Checker) int_lit(mut node ast.IntegerLiteral) ast.Type {
 }
 
 pub fn (mut c Checker) infer_fn_generic_types(f ast.Fn, mut call_expr ast.CallExpr) {
+	// c.warn('hi', call_expr.pos)
 	mut inferred_types := []ast.Type{}
 	for gi, gt_name in f.generic_names {
 		// skip known types

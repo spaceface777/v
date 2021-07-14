@@ -565,6 +565,7 @@ fn (mut p Parser) interface_decl() ast.InterfaceDecl {
 				pos: method.pos
 				return_type: method.return_type
 				is_variadic: is_variadic
+				generic_names: generic_types.map(p.table.get_type_name(it))
 				is_pub: true
 			}
 			ts.register_method(tmethod)

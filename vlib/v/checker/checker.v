@@ -821,7 +821,7 @@ pub fn (mut c Checker) generic_insts_to_concrete() {
 						}
 						mut imethods := parent_info.methods.clone()
 						for mut method in imethods {
-							method.generic_names.clear()
+							// method.generic_names.clear()
 							if pt := c.table.resolve_generic_to_concrete(method.return_type,
 								generic_names, info.concrete_types)
 							{
@@ -7619,7 +7619,8 @@ fn (mut c Checker) fetch_and_verify_orm_fields(info ast.Struct, pos token.Positi
 fn (mut c Checker) post_process_generic_fns() {
 	// Loop thru each generic function concrete type.
 	// Check each specific fn instantiation.
-	for i in 0 .. c.file.generic_fns.len {
+	generic_fns := c.file.generic_fns
+	for i in 0 .. generic_fns.len {
 		mut node := c.file.generic_fns[i]
 		c.mod = node.mod
 		for concrete_types in c.table.fn_generic_types[node.name] {

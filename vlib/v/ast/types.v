@@ -1164,7 +1164,7 @@ pub fn (t &TypeSymbol) find_method_with_generic_parent(name string) ?Fn {
 									param.typ = pt
 								}
 							}
-							method.generic_names.clear()
+							// method.generic_names.clear()
 							return method
 						}
 						else {}
